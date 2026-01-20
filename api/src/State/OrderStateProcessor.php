@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\State;
 
 use ApiPlatform\Metadata\DeleteOperationInterface;
@@ -17,13 +19,15 @@ final class OrderStateProcessor implements ProcessorInterface
     public function __construct(
         private readonly OrderService $orderService,
         private readonly Security $security,
-    ) {}
+    ) {
+    }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?Order
     {
         // Suppression
         if ($operation instanceof DeleteOperationInterface) {
             $this->orderService->deleteOrder($uriVariables['id']);
+
             return null;
         }
 

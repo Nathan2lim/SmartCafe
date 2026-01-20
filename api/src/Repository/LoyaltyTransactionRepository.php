@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\LoyaltyAccount;
@@ -36,7 +38,7 @@ class LoyaltyTransactionRepository extends ServiceEntityRepository
             ->setParameter('account', $account)
             ->orderBy('lt.createdAt', 'DESC');
 
-        if ($limit !== null) {
+        if (null !== $limit) {
             $qb->setMaxResults($limit);
         }
 

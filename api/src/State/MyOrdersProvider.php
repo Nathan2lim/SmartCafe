@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
@@ -13,7 +15,8 @@ final class MyOrdersProvider implements ProviderInterface
     public function __construct(
         private readonly Security $security,
         private readonly OrderRepository $orderRepository,
-    ) {}
+    ) {
+    }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {

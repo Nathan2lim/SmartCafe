@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service\Extra;
 
 use App\DTO\Extra\CreateExtraDTO;
@@ -7,12 +9,14 @@ use App\DTO\Extra\UpdateExtraDTO;
 use App\Entity\Extra;
 use App\Exception\ExtraNotFoundException;
 use App\Repository\ExtraRepository;
+use DateTimeImmutable;
 
 final class ExtraService
 {
     public function __construct(
         private readonly ExtraRepository $extraRepository,
-    ) {}
+    ) {
+    }
 
     public function createExtra(CreateExtraDTO $dto): Extra
     {
@@ -33,26 +37,26 @@ final class ExtraService
     {
         $extra = $this->getExtraById($id);
 
-        if ($dto->name !== null) {
+        if (null !== $dto->name) {
             $extra->setName($dto->name);
         }
-        if ($dto->description !== null) {
+        if (null !== $dto->description) {
             $extra->setDescription($dto->description);
         }
-        if ($dto->price !== null) {
+        if (null !== $dto->price) {
             $extra->setPrice($dto->price);
         }
-        if ($dto->stockQuantity !== null) {
+        if (null !== $dto->stockQuantity) {
             $extra->setStockQuantity($dto->stockQuantity);
         }
-        if ($dto->lowStockThreshold !== null) {
+        if (null !== $dto->lowStockThreshold) {
             $extra->setLowStockThreshold($dto->lowStockThreshold);
         }
-        if ($dto->available !== null) {
+        if (null !== $dto->available) {
             $extra->setAvailable($dto->available);
         }
 
-        $extra->setUpdatedAt(new \DateTimeImmutable());
+        $extra->setUpdatedAt(new DateTimeImmutable());
         $this->extraRepository->save($extra);
 
         return $extra;
@@ -95,7 +99,7 @@ final class ExtraService
     {
         $extra = $this->getExtraById($id);
         $extra->setStockQuantity($extra->getStockQuantity() + $quantity);
-        $extra->setUpdatedAt(new \DateTimeImmutable());
+        $extra->setUpdatedAt(new DateTimeImmutable());
 
         $this->extraRepository->save($extra);
 
@@ -105,7 +109,7 @@ final class ExtraService
     public function deductStock(Extra $extra, int $quantity): void
     {
         $extra->setStockQuantity($extra->getStockQuantity() - $quantity);
-        $extra->setUpdatedAt(new \DateTimeImmutable());
+        $extra->setUpdatedAt(new DateTimeImmutable());
 
         $this->extraRepository->save($extra);
     }

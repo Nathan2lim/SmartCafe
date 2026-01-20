@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Migration for Extras and Stock Management feature
+ * Migration for Extras and Stock Management feature.
  */
 final class Version20260120120000 extends AbstractMigration
 {

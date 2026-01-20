@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\OrderItemExtraRepository;
@@ -49,6 +51,7 @@ class OrderItemExtra
     public function setOrderItem(?OrderItem $orderItem): static
     {
         $this->orderItem = $orderItem;
+
         return $this;
     }
 
@@ -61,7 +64,7 @@ class OrderItemExtra
     {
         $this->extra = $extra;
 
-        if ($extra !== null) {
+        if (null !== $extra) {
             $this->unitPrice = $extra->getPrice();
         }
 
@@ -76,6 +79,7 @@ class OrderItemExtra
     public function setQuantity(int $quantity): static
     {
         $this->quantity = $quantity;
+
         return $this;
     }
 
@@ -87,6 +91,7 @@ class OrderItemExtra
     public function setUnitPrice(string $unitPrice): static
     {
         $this->unitPrice = $unitPrice;
+
         return $this;
     }
 
@@ -94,6 +99,7 @@ class OrderItemExtra
     public function getSubtotal(): string
     {
         $subtotal = (float) ($this->unitPrice ?? 0) * $this->quantity;
+
         return number_format($subtotal, 2, '.', '');
     }
 }

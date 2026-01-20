@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enum;
 
 enum OrderStatus: string
@@ -13,7 +15,7 @@ enum OrderStatus: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'En attente',
             self::CONFIRMED => 'Confirmée',
             self::PREPARING => 'En préparation',
@@ -24,27 +26,27 @@ enum OrderStatus: string
     }
 
     /**
-     * Vérifie si la transition vers un nouveau statut est autorisée
+     * Vérifie si la transition vers un nouveau statut est autorisée.
      */
     public function canTransitionTo(OrderStatus $newStatus): bool
     {
-        return match($this) {
-            self::PENDING => in_array($newStatus, [self::CONFIRMED, self::CANCELLED]),
-            self::CONFIRMED => in_array($newStatus, [self::PREPARING, self::CANCELLED]),
-            self::PREPARING => in_array($newStatus, [self::READY, self::CANCELLED]),
-            self::READY => in_array($newStatus, [self::DELIVERED]),
+        return match ($this) {
+            self::PENDING => \in_array($newStatus, [self::CONFIRMED, self::CANCELLED]),
+            self::CONFIRMED => \in_array($newStatus, [self::PREPARING, self::CANCELLED]),
+            self::PREPARING => \in_array($newStatus, [self::READY, self::CANCELLED]),
+            self::READY => \in_array($newStatus, [self::DELIVERED]),
             self::DELIVERED => false,
             self::CANCELLED => false,
         };
     }
 
     /**
-     * Retourne les statuts suivants possibles
+     * Retourne les statuts suivants possibles.
      * @return OrderStatus[]
      */
     public function nextPossibleStatuses(): array
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => [self::CONFIRMED, self::CANCELLED],
             self::CONFIRMED => [self::PREPARING, self::CANCELLED],
             self::PREPARING => [self::READY, self::CANCELLED],

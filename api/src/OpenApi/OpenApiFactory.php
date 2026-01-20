@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\OpenApi;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Model;
 use ApiPlatform\OpenApi\OpenApi;
+use ArrayObject;
 
 final class OpenApiFactory implements OpenApiFactoryInterface
 {
     public function __construct(
-        private readonly OpenApiFactoryInterface $decorated
-    ) {}
+        private readonly OpenApiFactoryInterface $decorated,
+    ) {
+    }
 
     public function __invoke(array $context = []): OpenApi
     {
@@ -33,7 +37,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $schemas = $openApi->getComponents()->getSchemas();
 
         // Schéma pour créer un utilisateur
-        $schemas['UserCreate'] = new \ArrayObject([
+        $schemas['UserCreate'] = new ArrayObject([
             'type' => 'object',
             'required' => ['email', 'plainPassword', 'firstName', 'lastName'],
             'properties' => [
@@ -70,7 +74,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         ]);
 
         // Schéma pour créer un produit
-        $schemas['ProductCreate'] = new \ArrayObject([
+        $schemas['ProductCreate'] = new ArrayObject([
             'type' => 'object',
             'required' => ['name', 'price', 'category'],
             'properties' => [
@@ -120,7 +124,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         ]);
 
         // Schéma pour créer un extra
-        $schemas['ExtraCreate'] = new \ArrayObject([
+        $schemas['ExtraCreate'] = new ArrayObject([
             'type' => 'object',
             'required' => ['name', 'price', 'stockQuantity'],
             'properties' => [
@@ -164,7 +168,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         ]);
 
         // Schéma pour restock un extra
-        $schemas['ExtraRestock'] = new \ArrayObject([
+        $schemas['ExtraRestock'] = new ArrayObject([
             'type' => 'object',
             'required' => ['quantity'],
             'properties' => [
@@ -178,7 +182,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         ]);
 
         // Schéma pour un extra dans un item de commande
-        $schemas['OrderItemExtraCreate'] = new \ArrayObject([
+        $schemas['OrderItemExtraCreate'] = new ArrayObject([
             'type' => 'object',
             'required' => ['extraId'],
             'properties' => [
@@ -199,7 +203,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         ]);
 
         // Schéma pour un item de commande
-        $schemas['OrderItemCreate'] = new \ArrayObject([
+        $schemas['OrderItemCreate'] = new ArrayObject([
             'type' => 'object',
             'required' => ['product', 'quantity'],
             'properties' => [
@@ -230,7 +234,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         ]);
 
         // Schéma pour créer une commande
-        $schemas['OrderCreate'] = new \ArrayObject([
+        $schemas['OrderCreate'] = new ArrayObject([
             'type' => 'object',
             'required' => ['items'],
             'properties' => [
@@ -256,7 +260,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         ]);
 
         // Schéma pour modifier le statut d'une commande
-        $schemas['OrderStatusUpdate'] = new \ArrayObject([
+        $schemas['OrderStatusUpdate'] = new ArrayObject([
             'type' => 'object',
             'required' => ['status'],
             'properties' => [
@@ -270,7 +274,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         ]);
 
         // Schéma pour le login
-        $schemas['Credentials'] = new \ArrayObject([
+        $schemas['Credentials'] = new ArrayObject([
             'type' => 'object',
             'required' => ['email', 'password'],
             'properties' => [
@@ -290,7 +294,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         ]);
 
         // Schéma pour la réponse token
-        $schemas['Token'] = new \ArrayObject([
+        $schemas['Token'] = new ArrayObject([
             'type' => 'object',
             'properties' => [
                 'token' => [
@@ -312,25 +316,25 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 description: 'Authentifie un utilisateur et retourne un token JWT',
                 requestBody: new Model\RequestBody(
                     description: 'Identifiants de connexion',
-                    content: new \ArrayObject([
+                    content: new ArrayObject([
                         'application/json' => new Model\MediaType(
-                            schema: new \ArrayObject(['$ref' => '#/components/schemas/Credentials'])
+                            schema: new ArrayObject(['$ref' => '#/components/schemas/Credentials']),
                         ),
                     ]),
-                    required: true
+                    required: true,
                 ),
                 responses: [
                     '200' => new Model\Response(
                         description: 'Connexion réussie',
-                        content: new \ArrayObject([
+                        content: new ArrayObject([
                             'application/json' => new Model\MediaType(
-                                schema: new \ArrayObject(['$ref' => '#/components/schemas/Token'])
+                                schema: new ArrayObject(['$ref' => '#/components/schemas/Token']),
                             ),
-                        ])
+                        ]),
                     ),
                     '401' => new Model\Response(description: 'Identifiants invalides'),
-                ]
-            )
+                ],
+            ),
         );
 
         $openApi->getPaths()->addPath('/api/login', $pathItem);
@@ -344,41 +348,41 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         foreach ($paths as $path => $pathItem) {
             // POST /api/users
-            if ($path === '/api/users' && $pathItem->getPost()) {
+            if ('/api/users' === $path && $pathItem->getPost()) {
                 $post = $pathItem->getPost();
                 $pathItem = $pathItem->withPost(
                     $post->withRequestBody(
                         new Model\RequestBody(
                             description: 'Données du nouvel utilisateur',
-                            content: new \ArrayObject([
+                            content: new ArrayObject([
                                 'application/json' => new Model\MediaType(
-                                    schema: new \ArrayObject(['$ref' => '#/components/schemas/UserCreate'])
+                                    schema: new ArrayObject(['$ref' => '#/components/schemas/UserCreate']),
                                 ),
                             ]),
-                            required: true
-                        )
+                            required: true,
+                        ),
                     )->withSummary('Créer un compte utilisateur')
-                      ->withDescription('Crée un nouveau compte utilisateur. Le mot de passe sera automatiquement hashé.')
+                      ->withDescription('Crée un nouveau compte utilisateur. Le mot de passe sera automatiquement hashé.'),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
 
             // POST /api/products
-            if ($path === '/api/products' && $pathItem->getPost()) {
+            if ('/api/products' === $path && $pathItem->getPost()) {
                 $post = $pathItem->getPost();
                 $pathItem = $pathItem->withPost(
                     $post->withRequestBody(
                         new Model\RequestBody(
                             description: 'Données du nouveau produit',
-                            content: new \ArrayObject([
+                            content: new ArrayObject([
                                 'application/json' => new Model\MediaType(
-                                    schema: new \ArrayObject(['$ref' => '#/components/schemas/ProductCreate'])
+                                    schema: new ArrayObject(['$ref' => '#/components/schemas/ProductCreate']),
                                 ),
                             ]),
-                            required: true
-                        )
+                            required: true,
+                        ),
                     )->withSummary('Ajouter un produit au menu')
-                      ->withDescription('Ajoute un nouveau produit au menu du café. Réservé aux administrateurs.')
+                      ->withDescription('Ajoute un nouveau produit au menu du café. Réservé aux administrateurs.'),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
@@ -390,35 +394,35 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $patch->withRequestBody(
                         new Model\RequestBody(
                             description: 'Champs à modifier',
-                            content: new \ArrayObject([
+                            content: new ArrayObject([
                                 'application/merge-patch+json' => new Model\MediaType(
-                                    schema: new \ArrayObject(['$ref' => '#/components/schemas/ProductCreate'])
+                                    schema: new ArrayObject(['$ref' => '#/components/schemas/ProductCreate']),
                                 ),
                             ]),
-                            required: true
-                        )
+                            required: true,
+                        ),
                     )->withSummary('Modifier un produit')
-                      ->withDescription('Modifie les informations d\'un produit existant. Seuls les champs envoyés seront modifiés.')
+                      ->withDescription('Modifie les informations d\'un produit existant. Seuls les champs envoyés seront modifiés.'),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
 
             // POST /api/orders
-            if ($path === '/api/orders' && $pathItem->getPost()) {
+            if ('/api/orders' === $path && $pathItem->getPost()) {
                 $post = $pathItem->getPost();
                 $pathItem = $pathItem->withPost(
                     $post->withRequestBody(
                         new Model\RequestBody(
                             description: 'Données de la commande',
-                            content: new \ArrayObject([
+                            content: new ArrayObject([
                                 'application/json' => new Model\MediaType(
-                                    schema: new \ArrayObject(['$ref' => '#/components/schemas/OrderCreate'])
+                                    schema: new ArrayObject(['$ref' => '#/components/schemas/OrderCreate']),
                                 ),
                             ]),
-                            required: true
-                        )
+                            required: true,
+                        ),
                     )->withSummary('Passer une commande')
-                      ->withDescription('Crée une nouvelle commande. Le client est automatiquement défini sur l\'utilisateur connecté.')
+                      ->withDescription('Crée une nouvelle commande. Le client est automatiquement défini sur l\'utilisateur connecté.'),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
@@ -430,35 +434,35 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $patch->withRequestBody(
                         new Model\RequestBody(
                             description: 'Nouveau statut',
-                            content: new \ArrayObject([
+                            content: new ArrayObject([
                                 'application/merge-patch+json' => new Model\MediaType(
-                                    schema: new \ArrayObject(['$ref' => '#/components/schemas/OrderStatusUpdate'])
+                                    schema: new ArrayObject(['$ref' => '#/components/schemas/OrderStatusUpdate']),
                                 ),
                             ]),
-                            required: true
-                        )
+                            required: true,
+                        ),
                     )->withSummary('Changer le statut d\'une commande')
-                      ->withDescription('Modifie le statut d\'une commande. Transitions valides : pending → confirmed → preparing → ready → delivered. Annulation possible jusqu\'à "ready".')
+                      ->withDescription('Modifie le statut d\'une commande. Transitions valides : pending → confirmed → preparing → ready → delivered. Annulation possible jusqu\'à "ready".'),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
 
             // POST /api/extras
-            if ($path === '/api/extras' && $pathItem->getPost()) {
+            if ('/api/extras' === $path && $pathItem->getPost()) {
                 $post = $pathItem->getPost();
                 $pathItem = $pathItem->withPost(
                     $post->withRequestBody(
                         new Model\RequestBody(
                             description: 'Données du nouvel extra',
-                            content: new \ArrayObject([
+                            content: new ArrayObject([
                                 'application/json' => new Model\MediaType(
-                                    schema: new \ArrayObject(['$ref' => '#/components/schemas/ExtraCreate'])
+                                    schema: new ArrayObject(['$ref' => '#/components/schemas/ExtraCreate']),
                                 ),
                             ]),
-                            required: true
-                        )
+                            required: true,
+                        ),
                     )->withSummary('Ajouter un extra au menu')
-                      ->withDescription('Ajoute un nouvel extra (supplément) au menu. Réservé aux administrateurs.')
+                      ->withDescription('Ajoute un nouvel extra (supplément) au menu. Réservé aux administrateurs.'),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
@@ -470,90 +474,90 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $post->withRequestBody(
                         new Model\RequestBody(
                             description: 'Quantité à ajouter au stock',
-                            content: new \ArrayObject([
+                            content: new ArrayObject([
                                 'application/json' => new Model\MediaType(
-                                    schema: new \ArrayObject(['$ref' => '#/components/schemas/ExtraRestock'])
+                                    schema: new ArrayObject(['$ref' => '#/components/schemas/ExtraRestock']),
                                 ),
                             ]),
-                            required: true
-                        )
+                            required: true,
+                        ),
                     )->withSummary('Réapprovisionner un extra')
-                      ->withDescription('Ajoute une quantité au stock d\'un extra. Réservé aux administrateurs.')
+                      ->withDescription('Ajoute une quantité au stock d\'un extra. Réservé aux administrateurs.'),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
 
             // GET /api/extras/low-stock
-            if ($path === '/api/extras/low-stock' && $pathItem->getGet()) {
+            if ('/api/extras/low-stock' === $path && $pathItem->getGet()) {
                 $get = $pathItem->getGet();
                 $pathItem = $pathItem->withGet(
                     $get->withSummary('Récupère les extras en stock bas')
-                        ->withDescription('Retourne la liste des extras dont le stock est inférieur au seuil défini. Réservé aux administrateurs.')
+                        ->withDescription('Retourne la liste des extras dont le stock est inférieur au seuil défini. Réservé aux administrateurs.'),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
 
             // GET /api/products/low-stock
-            if ($path === '/api/products/low-stock' && $pathItem->getGet()) {
+            if ('/api/products/low-stock' === $path && $pathItem->getGet()) {
                 $get = $pathItem->getGet();
                 $pathItem = $pathItem->withGet(
                     $get->withSummary('Récupère les produits en stock bas')
-                        ->withDescription('Retourne la liste des produits dont le stock est inférieur au seuil défini. Réservé aux administrateurs.')
+                        ->withDescription('Retourne la liste des produits dont le stock est inférieur au seuil défini. Réservé aux administrateurs.'),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
 
             // GET /api/auth/me
-            if ($path === '/api/auth/me' && $pathItem->getGet()) {
+            if ('/api/auth/me' === $path && $pathItem->getGet()) {
                 $get = $pathItem->getGet();
                 $pathItem = $pathItem->withGet(
                     $get->withSummary('Informations de l\'utilisateur connecté')
                         ->withDescription('Retourne les informations complètes de l\'utilisateur actuellement connecté, incluant un lien vers son historique de commandes.')
-                        ->withTags(['Authentification'])
+                        ->withTags(['Authentification']),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
 
             // GET /api/auth/me/orders
-            if ($path === '/api/auth/me/orders' && $pathItem->getGet()) {
+            if ('/api/auth/me/orders' === $path && $pathItem->getGet()) {
                 $get = $pathItem->getGet();
                 $pathItem = $pathItem->withGet(
                     $get->withSummary('Historique des commandes de l\'utilisateur')
                         ->withDescription('Retourne l\'historique complet des commandes de l\'utilisateur connecté, triées par date de création décroissante.')
-                        ->withTags(['Authentification'])
+                        ->withTags(['Authentification']),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
 
             // GET /api/auth/me/loyalty
-            if ($path === '/api/auth/me/loyalty' && $pathItem->getGet()) {
+            if ('/api/auth/me/loyalty' === $path && $pathItem->getGet()) {
                 $get = $pathItem->getGet();
                 $pathItem = $pathItem->withGet(
                     $get->withSummary('Compte fidélité de l\'utilisateur')
                         ->withDescription('Retourne les informations du compte fidélité: points, niveau, historique des transactions.')
-                        ->withTags(['Fidélité'])
+                        ->withTags(['Fidélité']),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
 
             // GET /api/auth/me/loyalty/transactions
-            if ($path === '/api/auth/me/loyalty/transactions' && $pathItem->getGet()) {
+            if ('/api/auth/me/loyalty/transactions' === $path && $pathItem->getGet()) {
                 $get = $pathItem->getGet();
                 $pathItem = $pathItem->withGet(
                     $get->withSummary('Historique des transactions fidélité')
                         ->withDescription('Retourne l\'historique des points gagnés et dépensés.')
-                        ->withTags(['Fidélité'])
+                        ->withTags(['Fidélité']),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
 
             // GET /api/loyalty/rewards
-            if ($path === '/api/loyalty/rewards' && $pathItem->getGet()) {
+            if ('/api/loyalty/rewards' === $path && $pathItem->getGet()) {
                 $get = $pathItem->getGet();
                 $pathItem = $pathItem->withGet(
                     $get->withSummary('Liste des récompenses disponibles')
                         ->withDescription('Retourne la liste des récompenses échangeables contre des points.')
-                        ->withTags(['Fidélité'])
+                        ->withTags(['Fidélité']),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
@@ -564,7 +568,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $pathItem = $pathItem->withPost(
                     $post->withSummary('Échanger une récompense')
                         ->withDescription('Échange des points contre une récompense. Retourne la transaction créée.')
-                        ->withTags(['Fidélité'])
+                        ->withTags(['Fidélité']),
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -12,6 +14,7 @@ use ApiPlatform\Metadata\Post;
 use App\Repository\ExtraRepository;
 use App\State\ExtraStateProcessor;
 use App\State\LowStockExtrasProvider;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -27,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/extras/low-stock',
             security: "is_granted('ROLE_ADMIN')",
             provider: LowStockExtrasProvider::class,
-            name: 'get_low_stock_extras'
+            name: 'get_low_stock_extras',
         ),
         new Post(security: "is_granted('ROLE_ADMIN')", processor: ExtraStateProcessor::class),
         new Get(),
@@ -37,7 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/extras/{id}/restock',
             security: "is_granted('ROLE_ADMIN')",
             processor: ExtraStateProcessor::class,
-            name: 'restock_extra'
+            name: 'restock_extra',
         ),
     ],
     normalizationContext: ['groups' => ['extra:read']],
@@ -87,11 +90,11 @@ class Extra
 
     #[ORM\Column]
     #[Groups(['extra:read'])]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['extra:read'])]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
     #[ORM\OneToMany(targetEntity: ProductExtra::class, mappedBy: 'extra', orphanRemoval: true)]
     private Collection $productExtras;
@@ -101,7 +104,7 @@ class Extra
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
         $this->productExtras = new ArrayCollection();
         $this->orderItemExtras = new ArrayCollection();
     }
@@ -119,6 +122,7 @@ class Extra
     public function setName(string $name): static
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -130,6 +134,7 @@ class Extra
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -141,6 +146,7 @@ class Extra
     public function setPrice(string $price): static
     {
         $this->price = $price;
+
         return $this;
     }
 
@@ -152,6 +158,7 @@ class Extra
     public function setStockQuantity(int $stockQuantity): static
     {
         $this->stockQuantity = $stockQuantity;
+
         return $this;
     }
 
@@ -163,6 +170,7 @@ class Extra
     public function setLowStockThreshold(int $lowStockThreshold): static
     {
         $this->lowStockThreshold = $lowStockThreshold;
+
         return $this;
     }
 
@@ -174,28 +182,31 @@ class Extra
     public function setAvailable(bool $available): static
     {
         $this->available = $available;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 

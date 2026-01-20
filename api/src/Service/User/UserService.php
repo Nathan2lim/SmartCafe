@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service\User;
 
 use App\DTO\User\CreateUserDTO;
@@ -8,6 +10,7 @@ use App\Entity\User;
 use App\Exception\UserAlreadyExistsException;
 use App\Exception\UserNotFoundException;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class UserService
@@ -15,10 +18,11 @@ final class UserService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly UserPasswordHasherInterface $passwordHasher,
-    ) {}
+    ) {
+    }
 
     /**
-     * Crée un nouvel utilisateur
+     * Crée un nouvel utilisateur.
      */
     public function createUser(CreateUserDTO $dto): User
     {
@@ -43,13 +47,13 @@ final class UserService
     }
 
     /**
-     * Met à jour un utilisateur
+     * Met à jour un utilisateur.
      */
     public function updateUser(int $id, UpdateUserDTO $dto): User
     {
         $user = $this->getUserById($id);
 
-        if ($dto->email !== null && $dto->email !== $user->getEmail()) {
+        if (null !== $dto->email && $dto->email !== $user->getEmail()) {
             // Vérifier si le nouvel email n'est pas déjà utilisé
             if ($this->userRepository->findOneBy(['email' => $dto->email])) {
                 throw new UserAlreadyExistsException($dto->email);
@@ -57,31 +61,31 @@ final class UserService
             $user->setEmail($dto->email);
         }
 
-        if ($dto->firstName !== null) {
+        if (null !== $dto->firstName) {
             $user->setFirstName($dto->firstName);
         }
 
-        if ($dto->lastName !== null) {
+        if (null !== $dto->lastName) {
             $user->setLastName($dto->lastName);
         }
 
-        if ($dto->phone !== null) {
+        if (null !== $dto->phone) {
             $user->setPhone($dto->phone);
         }
 
-        if ($dto->password !== null) {
+        if (null !== $dto->password) {
             $hashedPassword = $this->passwordHasher->hashPassword($user, $dto->password);
             $user->setPassword($hashedPassword);
         }
 
-        $user->setUpdatedAt(new \DateTimeImmutable());
+        $user->setUpdatedAt(new DateTimeImmutable());
         $this->userRepository->save($user);
 
         return $user;
     }
 
     /**
-     * Récupère un utilisateur par son ID
+     * Récupère un utilisateur par son ID.
      */
     public function getUserById(int $id): User
     {
@@ -95,7 +99,7 @@ final class UserService
     }
 
     /**
-     * Récupère tous les utilisateurs
+     * Récupère tous les utilisateurs.
      */
     public function getAllUsers(): array
     {
@@ -103,7 +107,7 @@ final class UserService
     }
 
     /**
-     * Supprime un utilisateur
+     * Supprime un utilisateur.
      */
     public function deleteUser(int $id): void
     {
@@ -112,7 +116,7 @@ final class UserService
     }
 
     /**
-     * Récupère un utilisateur par son email
+     * Récupère un utilisateur par son email.
      */
     public function getUserByEmail(string $email): ?User
     {

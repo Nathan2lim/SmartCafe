@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -12,6 +14,7 @@ use ApiPlatform\Metadata\Post;
 use App\Enum\RewardType;
 use App\Repository\LoyaltyRewardRepository;
 use App\State\RedeemRewardProcessor;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -22,32 +25,32 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: '/loyalty/rewards',
-            name: 'get_loyalty_rewards'
+            name: 'get_loyalty_rewards',
         ),
         new Post(
             uriTemplate: '/loyalty/rewards',
             security: "is_granted('ROLE_ADMIN')",
-            name: 'create_loyalty_reward'
+            name: 'create_loyalty_reward',
         ),
         new Get(
             uriTemplate: '/loyalty/rewards/{id}',
-            name: 'get_loyalty_reward'
+            name: 'get_loyalty_reward',
         ),
         new Patch(
             uriTemplate: '/loyalty/rewards/{id}',
             security: "is_granted('ROLE_ADMIN')",
-            name: 'update_loyalty_reward'
+            name: 'update_loyalty_reward',
         ),
         new Delete(
             uriTemplate: '/loyalty/rewards/{id}',
             security: "is_granted('ROLE_ADMIN')",
-            name: 'delete_loyalty_reward'
+            name: 'delete_loyalty_reward',
         ),
         new Post(
             uriTemplate: '/loyalty/rewards/{id}/redeem',
             security: "is_granted('ROLE_USER')",
             processor: RedeemRewardProcessor::class,
-            name: 'redeem_loyalty_reward'
+            name: 'redeem_loyalty_reward',
         ),
     ],
     normalizationContext: ['groups' => ['reward:read']],
@@ -114,15 +117,15 @@ class LoyaltyReward
 
     #[ORM\Column]
     #[Groups(['reward:read'])]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['reward:read'])]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -138,6 +141,7 @@ class LoyaltyReward
     public function setName(string $name): static
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -149,6 +153,7 @@ class LoyaltyReward
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -160,6 +165,7 @@ class LoyaltyReward
     public function setPointsCost(int $pointsCost): static
     {
         $this->pointsCost = $pointsCost;
+
         return $this;
     }
 
@@ -171,6 +177,7 @@ class LoyaltyReward
     public function setType(RewardType $type): static
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -182,6 +189,7 @@ class LoyaltyReward
     public function setDiscountValue(?string $discountValue): static
     {
         $this->discountValue = $discountValue;
+
         return $this;
     }
 
@@ -193,6 +201,7 @@ class LoyaltyReward
     public function setDiscountPercent(?int $discountPercent): static
     {
         $this->discountPercent = $discountPercent;
+
         return $this;
     }
 
@@ -204,6 +213,7 @@ class LoyaltyReward
     public function setFreeProduct(?Product $freeProduct): static
     {
         $this->freeProduct = $freeProduct;
+
         return $this;
     }
 
@@ -215,6 +225,7 @@ class LoyaltyReward
     public function setRequiredTier(?string $requiredTier): static
     {
         $this->requiredTier = $requiredTier;
+
         return $this;
     }
 
@@ -226,6 +237,7 @@ class LoyaltyReward
     public function setActive(bool $active): static
     {
         $this->active = $active;
+
         return $this;
     }
 
@@ -237,28 +249,31 @@ class LoyaltyReward
     public function setStockQuantity(?int $stockQuantity): static
     {
         $this->stockQuantity = $stockQuantity;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -269,7 +284,7 @@ class LoyaltyReward
             return false;
         }
 
-        if ($this->stockQuantity !== null && $this->stockQuantity <= 0) {
+        if (null !== $this->stockQuantity && $this->stockQuantity <= 0) {
             return false;
         }
 

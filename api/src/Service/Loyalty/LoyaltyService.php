@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service\Loyalty;
 
 use App\Entity\LoyaltyAccount;
@@ -32,7 +34,8 @@ final class LoyaltyService
         private readonly LoyaltyTransactionRepository $transactionRepository,
         private readonly LoyaltyRewardRepository $rewardRepository,
         private readonly EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     public function getOrCreateAccount(User $user): LoyaltyAccount
     {
@@ -51,11 +54,11 @@ final class LoyaltyService
         $transaction = new LoyaltyTransaction();
         $transaction->setType(LoyaltyTransactionType::EARN);
         $transaction->setPoints($points);
-        $transaction->setDescription(sprintf(
+        $transaction->setDescription(\sprintf(
             'Points gagnés pour la commande %s (x%.2f bonus %s)',
             $order->getOrderNumber(),
             $multiplier,
-            $account->getTier()
+            $account->getTier(),
         ));
         $transaction->setRelatedOrder($order);
 
@@ -78,25 +81,25 @@ final class LoyaltyService
         if ($account->getPoints() < $reward->getPointsCost()) {
             throw new InsufficientPointsException(
                 $reward->getPointsCost(),
-                $account->getPoints()
+                $account->getPoints(),
             );
         }
 
         $requiredTier = $reward->getRequiredTier();
-        if ($requiredTier !== null && !$this->meetsRequiredTier($account->getTier(), $requiredTier)) {
+        if (null !== $requiredTier && !$this->meetsRequiredTier($account->getTier(), $requiredTier)) {
             throw new TierRequirementNotMetException($requiredTier, $account->getTier());
         }
 
         $transaction = new LoyaltyTransaction();
         $transaction->setType(LoyaltyTransactionType::REDEEM);
         $transaction->setPoints($reward->getPointsCost());
-        $transaction->setDescription(sprintf('Récompense échangée: %s', $reward->getName()));
+        $transaction->setDescription(\sprintf('Récompense échangée: %s', $reward->getName()));
         $transaction->setRedeemedReward($reward);
 
         $account->deductPoints($reward->getPointsCost());
         $account->addTransaction($transaction);
 
-        if ($reward->getStockQuantity() !== null) {
+        if (null !== $reward->getStockQuantity()) {
             $reward->setStockQuantity($reward->getStockQuantity() - 1);
         }
 
@@ -168,6 +171,7 @@ final class LoyaltyService
     public function getAvailableRewardsForUser(User $user): array
     {
         $account = $this->getOrCreateAccount($user);
+
         return $this->rewardRepository->findAvailableForTier($account->getTier());
     }
 
@@ -177,6 +181,7 @@ final class LoyaltyService
     public function getAffordableRewardsForUser(User $user): array
     {
         $account = $this->getOrCreateAccount($user);
+
         return $this->rewardRepository->findAffordable($account->getPoints(), $account->getTier());
     }
 
@@ -186,6 +191,7 @@ final class LoyaltyService
     public function getTransactionHistory(User $user, ?int $limit = null): array
     {
         $account = $this->getOrCreateAccount($user);
+
         return $this->transactionRepository->findByAccount($account, $limit);
     }
 
@@ -193,6 +199,7 @@ final class LoyaltyService
     {
         $basePoints = (int) floor($amount * self::POINTS_PER_EURO);
         $multiplier = self::TIER_MULTIPLIERS[$tier] ?? 1.0;
+
         return (int) floor($basePoints * $multiplier);
     }
 

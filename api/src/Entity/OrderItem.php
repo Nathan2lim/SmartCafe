@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -68,6 +70,7 @@ class OrderItem
     public function setOrder(?Order $order): static
     {
         $this->order = $order;
+
         return $this;
     }
 
@@ -81,7 +84,7 @@ class OrderItem
         $this->product = $product;
 
         // Copier le prix du produit au moment de la commande
-        if ($product !== null) {
+        if (null !== $product) {
             $this->unitPrice = $product->getPrice();
         }
 
@@ -96,6 +99,7 @@ class OrderItem
     public function setQuantity(int $quantity): static
     {
         $this->quantity = $quantity;
+
         return $this;
     }
 
@@ -107,6 +111,7 @@ class OrderItem
     public function setUnitPrice(string $unitPrice): static
     {
         $this->unitPrice = $unitPrice;
+
         return $this;
     }
 
@@ -118,6 +123,7 @@ class OrderItem
     public function setSpecialInstructions(?string $specialInstructions): static
     {
         $this->specialInstructions = $specialInstructions;
+
         return $this;
     }
 
@@ -132,6 +138,7 @@ class OrderItem
         }
 
         $total = $productSubtotal + $extrasSubtotal;
+
         return number_format($total, 2, '.', '');
     }
 
@@ -149,6 +156,7 @@ class OrderItem
             $this->extras->add($extra);
             $extra->setOrderItem($this);
         }
+
         return $this;
     }
 
@@ -159,6 +167,7 @@ class OrderItem
                 $extra->setOrderItem(null);
             }
         }
+
         return $this;
     }
 }

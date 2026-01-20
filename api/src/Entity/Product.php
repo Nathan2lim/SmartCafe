@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -11,6 +13,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\ProductRepository;
 use App\State\LowStockProductsProvider;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -26,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/products/low-stock',
             security: "is_granted('ROLE_ADMIN')",
             provider: LowStockProductsProvider::class,
-            name: 'get_low_stock_products'
+            name: 'get_low_stock_products',
         ),
         new Post(security: "is_granted('ROLE_ADMIN')"),
         new Get(),
@@ -84,11 +87,11 @@ class Product
 
     #[ORM\Column]
     #[Groups(['product:read'])]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['product:read'])]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Assert\PositiveOrZero]
@@ -111,7 +114,7 @@ class Product
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
         $this->orderItems = new ArrayCollection();
         $this->availableExtras = new ArrayCollection();
     }
@@ -129,6 +132,7 @@ class Product
     public function setName(string $name): static
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -140,6 +144,7 @@ class Product
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -151,6 +156,7 @@ class Product
     public function setPrice(string $price): static
     {
         $this->price = $price;
+
         return $this;
     }
 
@@ -162,6 +168,7 @@ class Product
     public function setCategory(string $category): static
     {
         $this->category = $category;
+
         return $this;
     }
 
@@ -173,6 +180,7 @@ class Product
     public function setAvailable(bool $available): static
     {
         $this->available = $available;
+
         return $this;
     }
 
@@ -184,6 +192,7 @@ class Product
     public function setAlaCarte(bool $alaCarte): static
     {
         $this->alaCarte = $alaCarte;
+
         return $this;
     }
 
@@ -195,28 +204,31 @@ class Product
     public function setImageUrl(?string $imageUrl): static
     {
         $this->imageUrl = $imageUrl;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -236,6 +248,7 @@ class Product
     public function setStockQuantity(?int $stockQuantity): static
     {
         $this->stockQuantity = $stockQuantity;
+
         return $this;
     }
 
@@ -247,6 +260,7 @@ class Product
     public function setLowStockThreshold(int $lowStockThreshold): static
     {
         $this->lowStockThreshold = $lowStockThreshold;
+
         return $this;
     }
 
@@ -264,6 +278,7 @@ class Product
             $this->availableExtras->add($productExtra);
             $productExtra->setProduct($this);
         }
+
         return $this;
     }
 
@@ -274,15 +289,17 @@ class Product
                 $productExtra->setProduct(null);
             }
         }
+
         return $this;
     }
 
     #[Groups(['product:read'])]
     public function isLowStock(): bool
     {
-        if ($this->stockQuantity === null) {
+        if (null === $this->stockQuantity) {
             return false;
         }
+
         return $this->stockQuantity <= $this->lowStockThreshold;
     }
 }

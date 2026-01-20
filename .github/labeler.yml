@@ -1,0 +1,28 @@
+# Add labels based on files changed
+api:
+  - api/**/*
+
+tests:
+  - api/tests/**/*
+
+documentation:
+  - '**/*.md'
+  - 'docs/**/*'
+
+ci:
+  - .github/**/*
+  - api/docker/**/*
+  - api/Makefile
+
+dependencies:
+  - api/composer.json
+  - api/composer.lock
+
+database:
+  - api/migrations/**/*
+  - api/src/Entity/**/*
+  - api/src/Repository/**/*
+
+security:
+  - api/config/packages/security.yaml
+  - api/src/Security/**/*

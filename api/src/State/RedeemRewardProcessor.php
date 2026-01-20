@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
@@ -14,7 +16,8 @@ final class RedeemRewardProcessor implements ProcessorInterface
     public function __construct(
         private readonly Security $security,
         private readonly LoyaltyService $loyaltyService,
-    ) {}
+    ) {
+    }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): LoyaltyTransaction
     {

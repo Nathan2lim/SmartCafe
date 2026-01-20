@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -66,6 +68,7 @@ class ProductExtra
     public function setProduct(?Product $product): static
     {
         $this->product = $product;
+
         return $this;
     }
 
@@ -77,6 +80,7 @@ class ProductExtra
     public function setExtra(?Extra $extra): static
     {
         $this->extra = $extra;
+
         return $this;
     }
 
@@ -88,6 +92,7 @@ class ProductExtra
     public function setMaxQuantity(int $maxQuantity): static
     {
         $this->maxQuantity = $maxQuantity;
+
         return $this;
     }
 }

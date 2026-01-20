@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\State;
 
 use ApiPlatform\Metadata\DeleteOperationInterface;
@@ -14,18 +16,20 @@ final class UserStateProcessor implements ProcessorInterface
 {
     public function __construct(
         private readonly UserService $userService,
-    ) {}
+    ) {
+    }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?User
     {
         // Suppression
         if ($operation instanceof DeleteOperationInterface) {
             $this->userService->deleteUser($uriVariables['id']);
+
             return null;
         }
 
         // Création
-        if ($data instanceof User && $data->getId() === null) {
+        if ($data instanceof User && null === $data->getId()) {
             $dto = new CreateUserDTO(
                 email: $data->getEmail(),
                 password: $data->getPlainPassword(),
@@ -33,11 +37,12 @@ final class UserStateProcessor implements ProcessorInterface
                 lastName: $data->getLastName(),
                 phone: $data->getPhone(),
             );
+
             return $this->userService->createUser($dto);
         }
 
         // Mise à jour
-        if ($data instanceof User && $data->getId() !== null) {
+        if ($data instanceof User && null !== $data->getId()) {
             $dto = new UpdateUserDTO(
                 email: $data->getEmail(),
                 password: $data->getPlainPassword(),
@@ -45,6 +50,7 @@ final class UserStateProcessor implements ProcessorInterface
                 lastName: $data->getLastName(),
                 phone: $data->getPhone(),
             );
+
             return $this->userService->updateUser($data->getId(), $dto);
         }
 

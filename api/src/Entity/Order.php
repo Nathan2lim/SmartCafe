@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -13,6 +15,7 @@ use App\Enum\OrderStatus;
 use App\Repository\OrderRepository;
 use App\State\MyOrdersProvider;
 use App\State\OrderStateProcessor;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -29,16 +32,16 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/auth/me/orders',
             provider: MyOrdersProvider::class,
             security: "is_granted('ROLE_USER')",
-            name: 'get_my_orders'
+            name: 'get_my_orders',
         ),
         new Post(
             security: "is_granted('ROLE_USER')",
-            processor: OrderStateProcessor::class
+            processor: OrderStateProcessor::class,
         ),
         new Get(security: "is_granted('ROLE_ADMIN') or object.getCustomer() == user"),
         new Patch(
             security: "is_granted('ROLE_ADMIN')",
-            processor: OrderStateProcessor::class
+            processor: OrderStateProcessor::class,
         ),
         new Delete(security: "is_granted('ROLE_ADMIN')"),
     ],
@@ -90,28 +93,28 @@ class Order
 
     #[ORM\Column]
     #[Groups(['order:read'])]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['order:read'])]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['order:read'])]
-    private ?\DateTimeImmutable $confirmedAt = null;
+    private ?DateTimeImmutable $confirmedAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['order:read'])]
-    private ?\DateTimeImmutable $readyAt = null;
+    private ?DateTimeImmutable $readyAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['order:read'])]
-    private ?\DateTimeImmutable $deliveredAt = null;
+    private ?DateTimeImmutable $deliveredAt = null;
 
     public function __construct()
     {
         $this->items = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
         $this->orderNumber = $this->generateOrderNumber();
     }
 
@@ -133,6 +136,7 @@ class Order
     public function setOrderNumber(string $orderNumber): static
     {
         $this->orderNumber = $orderNumber;
+
         return $this;
     }
 
@@ -144,6 +148,7 @@ class Order
     public function setCustomer(?User $customer): static
     {
         $this->customer = $customer;
+
         return $this;
     }
 
@@ -155,6 +160,7 @@ class Order
     public function setStatus(OrderStatus $status): static
     {
         $this->status = $status;
+
         return $this;
     }
 
@@ -172,6 +178,7 @@ class Order
             $this->items->add($item);
             $item->setOrder($this);
         }
+
         return $this;
     }
 
@@ -182,6 +189,7 @@ class Order
                 $item->setOrder(null);
             }
         }
+
         return $this;
     }
 
@@ -193,6 +201,7 @@ class Order
     public function setTotalAmount(string $totalAmount): static
     {
         $this->totalAmount = $totalAmount;
+
         return $this;
     }
 
@@ -213,6 +222,7 @@ class Order
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
+
         return $this;
     }
 
@@ -224,61 +234,67 @@ class Order
     public function setTableNumber(?string $tableNumber): static
     {
         $this->tableNumber = $tableNumber;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
-    public function getConfirmedAt(): ?\DateTimeImmutable
+    public function getConfirmedAt(): ?DateTimeImmutable
     {
         return $this->confirmedAt;
     }
 
-    public function setConfirmedAt(?\DateTimeImmutable $confirmedAt): static
+    public function setConfirmedAt(?DateTimeImmutable $confirmedAt): static
     {
         $this->confirmedAt = $confirmedAt;
+
         return $this;
     }
 
-    public function getReadyAt(): ?\DateTimeImmutable
+    public function getReadyAt(): ?DateTimeImmutable
     {
         return $this->readyAt;
     }
 
-    public function setReadyAt(?\DateTimeImmutable $readyAt): static
+    public function setReadyAt(?DateTimeImmutable $readyAt): static
     {
         $this->readyAt = $readyAt;
+
         return $this;
     }
 
-    public function getDeliveredAt(): ?\DateTimeImmutable
+    public function getDeliveredAt(): ?DateTimeImmutable
     {
         return $this->deliveredAt;
     }
 
-    public function setDeliveredAt(?\DateTimeImmutable $deliveredAt): static
+    public function setDeliveredAt(?DateTimeImmutable $deliveredAt): static
     {
         $this->deliveredAt = $deliveredAt;
+
         return $this;
     }
 }

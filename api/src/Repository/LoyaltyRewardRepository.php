@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\LoyaltyReward;
@@ -58,10 +60,11 @@ class LoyaltyRewardRepository extends ServiceEntityRepository
 
         return array_filter($rewards, function (LoyaltyReward $reward) use ($tierOrder, $userTierLevel) {
             $requiredTier = $reward->getRequiredTier();
-            if ($requiredTier === null) {
+            if (null === $requiredTier) {
                 return true;
             }
             $requiredLevel = $tierOrder[$requiredTier] ?? 0;
+
             return $userTierLevel >= $requiredLevel;
         });
     }

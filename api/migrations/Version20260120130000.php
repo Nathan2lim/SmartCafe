@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Migration for Loyalty System
+ * Migration for Loyalty System.
  */
 final class Version20260120130000 extends AbstractMigration
 {

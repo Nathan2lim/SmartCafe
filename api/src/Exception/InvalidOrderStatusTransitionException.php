@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exception;
 
 use App\Enum\OrderStatus;
@@ -9,10 +11,10 @@ final class InvalidOrderStatusTransitionException extends BadRequestHttpExceptio
 {
     public function __construct(OrderStatus $currentStatus, OrderStatus $newStatus)
     {
-        parent::__construct(sprintf(
+        parent::__construct(\sprintf(
             'Transition de statut invalide : impossible de passer de "%s" à "%s"',
             $currentStatus->label(),
-            $newStatus->label()
+            $newStatus->label(),
         ));
     }
 }

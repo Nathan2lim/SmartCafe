@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -9,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Enum\LoyaltyTransactionType;
 use App\Repository\LoyaltyTransactionRepository;
 use App\State\MyLoyaltyTransactionsProvider;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -20,7 +23,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/auth/me/loyalty/transactions',
             provider: MyLoyaltyTransactionsProvider::class,
             security: "is_granted('ROLE_USER')",
-            name: 'get_my_loyalty_transactions'
+            name: 'get_my_loyalty_transactions',
         ),
         new Get(security: "is_granted('ROLE_ADMIN') or object.getAccount().getUser() == user"),
     ],
@@ -66,11 +69,11 @@ class LoyaltyTransaction
 
     #[ORM\Column]
     #[Groups(['loyalty_transaction:read', 'loyalty:me'])]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -86,6 +89,7 @@ class LoyaltyTransaction
     public function setAccount(?LoyaltyAccount $account): static
     {
         $this->account = $account;
+
         return $this;
     }
 
@@ -97,6 +101,7 @@ class LoyaltyTransaction
     public function setType(LoyaltyTransactionType $type): static
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -108,6 +113,7 @@ class LoyaltyTransaction
     public function setPoints(int $points): static
     {
         $this->points = $points;
+
         return $this;
     }
 
@@ -119,6 +125,7 @@ class LoyaltyTransaction
     public function setDescription(string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -130,6 +137,7 @@ class LoyaltyTransaction
     public function setRelatedOrder(?Order $relatedOrder): static
     {
         $this->relatedOrder = $relatedOrder;
+
         return $this;
     }
 
@@ -141,17 +149,19 @@ class LoyaltyTransaction
     public function setRedeemedReward(?LoyaltyReward $redeemedReward): static
     {
         $this->redeemedReward = $redeemedReward;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 }

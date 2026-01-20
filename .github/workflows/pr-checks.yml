@@ -1,0 +1,56 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit messages
+        uses: wagoid/commitlint-github-action@v5
+        continue-on-error: true
+
+      - name: Check for merge conflicts
+        run: |
+          git fetch origin main
+          if git merge-tree $(git merge-base HEAD origin/main) HEAD origin/main | grep -q "^<<<<<<<"; then
+            echo "Merge conflicts detected!"
+            exit 1
+          fi
+
+  label:
+    name: Auto Label
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Label PR based on files changed
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+  size:
+    name: PR Size Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR size
+        run: |
+          ADDITIONS=$(git diff --numstat origin/main...HEAD | awk '{ added += $1 } END { print added }')
+          echo "Lines added: $ADDITIONS"
+          if [ "$ADDITIONS" -gt 1000 ]; then
+            echo "::warning::Large PR detected ($ADDITIONS lines). Consider breaking it into smaller PRs."
+          fi

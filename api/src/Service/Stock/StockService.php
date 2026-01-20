@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service\Stock;
 
 use App\Entity\Extra;
@@ -7,6 +9,7 @@ use App\Entity\Product;
 use App\Exception\InsufficientStockException;
 use App\Repository\ExtraRepository;
 use App\Repository\ProductRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class StockService
@@ -15,7 +18,8 @@ final class StockService
         private readonly ProductRepository $productRepository,
         private readonly ExtraRepository $extraRepository,
         private readonly EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     // Product stock methods
 
@@ -24,7 +28,7 @@ final class StockService
         $stockQuantity = $product->getStockQuantity();
 
         // Si le stock est null, on considère qu'il n'y a pas de gestion de stock
-        if ($stockQuantity === null) {
+        if (null === $stockQuantity) {
             return true;
         }
 
@@ -36,7 +40,7 @@ final class StockService
         $stockQuantity = $product->getStockQuantity();
 
         // Si le stock est null, pas de gestion de stock
-        if ($stockQuantity === null) {
+        if (null === $stockQuantity) {
             return;
         }
 
@@ -44,12 +48,12 @@ final class StockService
             throw new InsufficientStockException(
                 $product->getName(),
                 $quantity,
-                $stockQuantity
+                $stockQuantity,
             );
         }
 
         $product->setStockQuantity($stockQuantity - $quantity);
-        $product->setUpdatedAt(new \DateTimeImmutable());
+        $product->setUpdatedAt(new DateTimeImmutable());
         $this->entityManager->flush();
     }
 
@@ -57,7 +61,7 @@ final class StockService
     {
         $currentStock = $product->getStockQuantity() ?? 0;
         $product->setStockQuantity($currentStock + $quantity);
-        $product->setUpdatedAt(new \DateTimeImmutable());
+        $product->setUpdatedAt(new DateTimeImmutable());
         $this->entityManager->flush();
     }
 
@@ -82,19 +86,19 @@ final class StockService
             throw new InsufficientStockException(
                 $extra->getName(),
                 $quantity,
-                $extra->getStockQuantity()
+                $extra->getStockQuantity(),
             );
         }
 
         $extra->setStockQuantity($extra->getStockQuantity() - $quantity);
-        $extra->setUpdatedAt(new \DateTimeImmutable());
+        $extra->setUpdatedAt(new DateTimeImmutable());
         $this->entityManager->flush();
     }
 
     public function restockExtra(Extra $extra, int $quantity): void
     {
         $extra->setStockQuantity($extra->getStockQuantity() + $quantity);
-        $extra->setUpdatedAt(new \DateTimeImmutable());
+        $extra->setUpdatedAt(new DateTimeImmutable());
         $this->entityManager->flush();
     }
 
@@ -112,9 +116,10 @@ final class StockService
     {
         if ($item instanceof Product) {
             $stockQuantity = $item->getStockQuantity();
-            if ($stockQuantity === null) {
+            if (null === $stockQuantity) {
                 return false;
             }
+
             return $stockQuantity <= $item->getLowStockThreshold();
         }
 

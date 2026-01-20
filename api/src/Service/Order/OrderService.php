@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service\Order;
 
 use App\DTO\Order\CreateOrderDTO;
 use App\DTO\Order\OrderItemDTO;
 use App\DTO\Order\OrderItemExtraDTO;
-use App\DTO\Order\UpdateOrderStatusDTO;
 use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Entity\OrderItemExtra;
@@ -25,7 +26,9 @@ use App\Repository\ProductExtraRepository;
 use App\Repository\ProductRepository;
 use App\Service\Loyalty\LoyaltyService;
 use App\Service\Stock\StockService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 
 final class OrderService
 {
@@ -37,10 +40,11 @@ final class OrderService
         private readonly StockService $stockService,
         private readonly LoyaltyService $loyaltyService,
         private readonly EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     /**
-     * Crée une nouvelle commande
+     * Crée une nouvelle commande.
      */
     public function createOrder(CreateOrderDTO $dto, User $customer): Order
     {
@@ -72,7 +76,7 @@ final class OrderService
     }
 
     /**
-     * Crée un item de commande
+     * Crée un item de commande.
      */
     private function createOrderItem(OrderItemDTO $dto): OrderItem
     {
@@ -91,7 +95,7 @@ final class OrderService
             throw new InsufficientStockException(
                 $product->getName(),
                 $dto->quantity,
-                $product->getStockQuantity() ?? 0
+                $product->getStockQuantity() ?? 0,
             );
         }
 
@@ -117,7 +121,7 @@ final class OrderService
     }
 
     /**
-     * Crée un extra pour un item de commande
+     * Crée un extra pour un item de commande.
      */
     private function createOrderItemExtra(OrderItemExtraDTO $dto, \App\Entity\Product $product, int $itemQuantity): OrderItemExtra
     {
@@ -139,10 +143,10 @@ final class OrderService
 
         // Vérifier que la quantité ne dépasse pas le max autorisé
         if ($dto->quantity > $productExtra->getMaxQuantity()) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(\sprintf(
                 'La quantité de l\'extra "%s" ne peut pas dépasser %d par item',
                 $extra->getName(),
-                $productExtra->getMaxQuantity()
+                $productExtra->getMaxQuantity(),
             ));
         }
 
@@ -154,7 +158,7 @@ final class OrderService
             throw new InsufficientStockException(
                 $extra->getName(),
                 $totalExtraQuantity,
-                $extra->getStockQuantity()
+                $extra->getStockQuantity(),
             );
         }
 
@@ -166,13 +170,13 @@ final class OrderService
     }
 
     /**
-     * Met à jour le statut d'une commande
+     * Met à jour le statut d'une commande.
      */
     public function updateOrderStatus(Order $order, OrderStatus $newStatus): Order
     {
         // Récupérer le statut actuel depuis la base de données
         $currentStatusQuery = $this->entityManager->createQuery(
-            'SELECT o.status FROM App\Entity\Order o WHERE o.id = :id'
+            'SELECT o.status FROM App\Entity\Order o WHERE o.id = :id',
         )->setParameter('id', $order->getId());
 
         $result = $currentStatusQuery->getSingleResult();
@@ -184,28 +188,28 @@ final class OrderService
         }
 
         // Déduire le stock lors de la confirmation
-        if ($newStatus === OrderStatus::CONFIRMED) {
+        if (OrderStatus::CONFIRMED === $newStatus) {
             $this->deductStockForOrder($order);
         }
 
         // Restaurer le stock lors de l'annulation
-        if ($newStatus === OrderStatus::CANCELLED && $currentStatus === OrderStatus::CONFIRMED) {
+        if (OrderStatus::CANCELLED === $newStatus && OrderStatus::CONFIRMED === $currentStatus) {
             $this->restoreStockForOrder($order);
         }
 
         // Attribuer les points de fidélité lors de la livraison
-        if ($newStatus === OrderStatus::DELIVERED) {
+        if (OrderStatus::DELIVERED === $newStatus) {
             $this->loyaltyService->awardPointsForOrder($order);
         }
 
         $order->setStatus($newStatus);
-        $order->setUpdatedAt(new \DateTimeImmutable());
+        $order->setUpdatedAt(new DateTimeImmutable());
 
         // Mettre à jour les timestamps selon le statut
         match ($newStatus) {
-            OrderStatus::CONFIRMED => $order->setConfirmedAt(new \DateTimeImmutable()),
-            OrderStatus::READY => $order->setReadyAt(new \DateTimeImmutable()),
-            OrderStatus::DELIVERED => $order->setDeliveredAt(new \DateTimeImmutable()),
+            OrderStatus::CONFIRMED => $order->setConfirmedAt(new DateTimeImmutable()),
+            OrderStatus::READY => $order->setReadyAt(new DateTimeImmutable()),
+            OrderStatus::DELIVERED => $order->setDeliveredAt(new DateTimeImmutable()),
             default => null,
         };
 
@@ -215,7 +219,7 @@ final class OrderService
     }
 
     /**
-     * Déduit le stock pour une commande
+     * Déduit le stock pour une commande.
      */
     private function deductStockForOrder(Order $order): void
     {
@@ -233,7 +237,7 @@ final class OrderService
     }
 
     /**
-     * Restaure le stock pour une commande annulée
+     * Restaure le stock pour une commande annulée.
      */
     private function restoreStockForOrder(Order $order): void
     {
@@ -251,7 +255,7 @@ final class OrderService
     }
 
     /**
-     * Récupère une commande par son ID
+     * Récupère une commande par son ID.
      */
     public function getOrderById(int $id): Order
     {
@@ -265,7 +269,7 @@ final class OrderService
     }
 
     /**
-     * Récupère les commandes d'un client
+     * Récupère les commandes d'un client.
      * @return Order[]
      */
     public function getOrdersByCustomer(User $customer): array
@@ -274,7 +278,7 @@ final class OrderService
     }
 
     /**
-     * Récupère les commandes par statut
+     * Récupère les commandes par statut.
      * @return Order[]
      */
     public function getOrdersByStatus(OrderStatus $status): array
@@ -283,7 +287,7 @@ final class OrderService
     }
 
     /**
-     * Récupère les commandes actives (non terminées)
+     * Récupère les commandes actives (non terminées).
      * @return Order[]
      */
     public function getActiveOrders(): array
@@ -292,7 +296,7 @@ final class OrderService
     }
 
     /**
-     * Récupère les commandes du jour
+     * Récupère les commandes du jour.
      * @return Order[]
      */
     public function getTodayOrders(): array
@@ -301,7 +305,7 @@ final class OrderService
     }
 
     /**
-     * Annule une commande
+     * Annule une commande.
      */
     public function cancelOrder(Order $order): Order
     {
@@ -309,7 +313,7 @@ final class OrderService
     }
 
     /**
-     * Supprime une commande
+     * Supprime une commande.
      */
     public function deleteOrder(int $id): void
     {

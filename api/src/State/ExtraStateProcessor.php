@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
@@ -7,6 +9,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Extra;
 use App\Service\Extra\ExtraService;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class ExtraStateProcessor implements ProcessorInterface
@@ -15,7 +18,8 @@ final class ExtraStateProcessor implements ProcessorInterface
         private readonly ProcessorInterface $persistProcessor,
         private readonly ExtraService $extraService,
         private readonly RequestStack $requestStack,
-    ) {}
+    ) {
+    }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Extra
     {
@@ -29,7 +33,7 @@ final class ExtraStateProcessor implements ProcessorInterface
         }
 
         // Regular create/update operations
-        $data->setUpdatedAt(new \DateTimeImmutable());
+        $data->setUpdatedAt(new DateTimeImmutable());
 
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
     }

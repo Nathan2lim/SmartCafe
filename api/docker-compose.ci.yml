@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.ci
+    container_name: smartcafe_php_ci
+    volumes:
+      - .:/var/www/html
+    environment:
+      APP_ENV: test
+      DATABASE_URL: postgresql://smartcafe:smartcafe@database:5432/smartcafe_test?serverVersion=16&charset=utf8
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - smartcafe_ci
+
+  database:
+    image: postgres:16-alpine
+    container_name: smartcafe_db_ci
+    environment:
+      POSTGRES_DB: smartcafe_test
+      POSTGRES_USER: smartcafe
+      POSTGRES_PASSWORD: smartcafe
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartcafe -d smartcafe_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smartcafe_ci
+
+networks:
+  smartcafe_ci:
+    driver: bridge

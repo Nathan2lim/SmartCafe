@@ -12,3 +12,35 @@
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+/phpstan-baseline.neon
+###< phpstan/phpstan ###
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+###> IDE ###
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+###< IDE ###
+
+###> Coverage ###
+/coverage/
+###< Coverage ###
+
+###> Docker ###
+docker-compose.override.yml
+###< Docker ###
