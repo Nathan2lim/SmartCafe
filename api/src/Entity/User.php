@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use App\Repository\UserRepository;
+use App\State\MeProvider;
 use App\State\UserStateProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -24,6 +25,13 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(security: "is_granted('ROLE_ADMIN')"),
         new Post(processor: UserStateProcessor::class),
         new Get(security: "is_granted('ROLE_ADMIN') or object == user"),
+        new Get(
+            uriTemplate: '/auth/me',
+            provider: MeProvider::class,
+            security: "is_granted('ROLE_USER')",
+            normalizationContext: ['groups' => ['user:read', 'user:me']],
+            name: 'get_me'
+        ),
         new Patch(security: "is_granted('ROLE_ADMIN') or object == user", processor: UserStateProcessor::class),
         new Delete(security: "is_granted('ROLE_ADMIN')", processor: UserStateProcessor::class),
     ],
@@ -81,6 +89,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     #[Groups(['user:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\OneToOne(targetEntity: LoyaltyAccount::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    #[Groups(['user:me'])]
+    private ?LoyaltyAccount $loyaltyAccount = null;
 
     public function __construct()
     {
@@ -202,5 +214,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->updatedAt = $updatedAt;
         return $this;
+    }
+
+    #[Groups(['user:me'])]
+    #[ApiProperty(example: '/api/auth/me/orders')]
+    public function getOrdersUrl(): string
+    {
+        return '/api/auth/me/orders';
+    }
+
+    public function getLoyaltyAccount(): ?LoyaltyAccount
+    {
+        return $this->loyaltyAccount;
+    }
+
+    public function setLoyaltyAccount(?LoyaltyAccount $loyaltyAccount): static
+    {
+        if ($loyaltyAccount !== null && $loyaltyAccount->getUser() !== $this) {
+            $loyaltyAccount->setUser($this);
+        }
+        $this->loyaltyAccount = $loyaltyAccount;
+        return $this;
+    }
+
+    #[Groups(['user:me'])]
+    #[ApiProperty(example: '/api/auth/me/loyalty')]
+    public function getLoyaltyUrl(): string
+    {
+        return '/api/auth/me/loyalty';
     }
 }

@@ -23,6 +23,7 @@ use App\Repository\ExtraRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ProductExtraRepository;
 use App\Repository\ProductRepository;
+use App\Service\Loyalty\LoyaltyService;
 use App\Service\Stock\StockService;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -34,6 +35,7 @@ final class OrderService
         private readonly ExtraRepository $extraRepository,
         private readonly ProductExtraRepository $productExtraRepository,
         private readonly StockService $stockService,
+        private readonly LoyaltyService $loyaltyService,
         private readonly EntityManagerInterface $entityManager,
     ) {}
 
@@ -189,6 +191,11 @@ final class OrderService
         // Restaurer le stock lors de l'annulation
         if ($newStatus === OrderStatus::CANCELLED && $currentStatus === OrderStatus::CONFIRMED) {
             $this->restoreStockForOrder($order);
+        }
+
+        // Attribuer les points de fidélité lors de la livraison
+        if ($newStatus === OrderStatus::DELIVERED) {
+            $this->loyaltyService->awardPointsForOrder($order);
         }
 
         $order->setStatus($newStatus);

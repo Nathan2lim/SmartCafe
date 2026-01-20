@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Enum\OrderStatus;
 use App\Repository\OrderRepository;
+use App\State\MyOrdersProvider;
 use App\State\OrderStateProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -24,6 +25,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('ROLE_ADMIN')"),
+        new GetCollection(
+            uriTemplate: '/auth/me/orders',
+            provider: MyOrdersProvider::class,
+            security: "is_granted('ROLE_USER')",
+            name: 'get_my_orders'
+        ),
         new Post(
             security: "is_granted('ROLE_USER')",
             processor: OrderStateProcessor::class

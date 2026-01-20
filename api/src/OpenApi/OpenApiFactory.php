@@ -502,6 +502,72 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 );
                 $openApi->getPaths()->addPath($path, $pathItem);
             }
+
+            // GET /api/auth/me
+            if ($path === '/api/auth/me' && $pathItem->getGet()) {
+                $get = $pathItem->getGet();
+                $pathItem = $pathItem->withGet(
+                    $get->withSummary('Informations de l\'utilisateur connecté')
+                        ->withDescription('Retourne les informations complètes de l\'utilisateur actuellement connecté, incluant un lien vers son historique de commandes.')
+                        ->withTags(['Authentification'])
+                );
+                $openApi->getPaths()->addPath($path, $pathItem);
+            }
+
+            // GET /api/auth/me/orders
+            if ($path === '/api/auth/me/orders' && $pathItem->getGet()) {
+                $get = $pathItem->getGet();
+                $pathItem = $pathItem->withGet(
+                    $get->withSummary('Historique des commandes de l\'utilisateur')
+                        ->withDescription('Retourne l\'historique complet des commandes de l\'utilisateur connecté, triées par date de création décroissante.')
+                        ->withTags(['Authentification'])
+                );
+                $openApi->getPaths()->addPath($path, $pathItem);
+            }
+
+            // GET /api/auth/me/loyalty
+            if ($path === '/api/auth/me/loyalty' && $pathItem->getGet()) {
+                $get = $pathItem->getGet();
+                $pathItem = $pathItem->withGet(
+                    $get->withSummary('Compte fidélité de l\'utilisateur')
+                        ->withDescription('Retourne les informations du compte fidélité: points, niveau, historique des transactions.')
+                        ->withTags(['Fidélité'])
+                );
+                $openApi->getPaths()->addPath($path, $pathItem);
+            }
+
+            // GET /api/auth/me/loyalty/transactions
+            if ($path === '/api/auth/me/loyalty/transactions' && $pathItem->getGet()) {
+                $get = $pathItem->getGet();
+                $pathItem = $pathItem->withGet(
+                    $get->withSummary('Historique des transactions fidélité')
+                        ->withDescription('Retourne l\'historique des points gagnés et dépensés.')
+                        ->withTags(['Fidélité'])
+                );
+                $openApi->getPaths()->addPath($path, $pathItem);
+            }
+
+            // GET /api/loyalty/rewards
+            if ($path === '/api/loyalty/rewards' && $pathItem->getGet()) {
+                $get = $pathItem->getGet();
+                $pathItem = $pathItem->withGet(
+                    $get->withSummary('Liste des récompenses disponibles')
+                        ->withDescription('Retourne la liste des récompenses échangeables contre des points.')
+                        ->withTags(['Fidélité'])
+                );
+                $openApi->getPaths()->addPath($path, $pathItem);
+            }
+
+            // POST /api/loyalty/rewards/{id}/redeem
+            if (preg_match('#^/api/loyalty/rewards/\{id\}/redeem$#', $path) && $pathItem->getPost()) {
+                $post = $pathItem->getPost();
+                $pathItem = $pathItem->withPost(
+                    $post->withSummary('Échanger une récompense')
+                        ->withDescription('Échange des points contre une récompense. Retourne la transaction créée.')
+                        ->withTags(['Fidélité'])
+                );
+                $openApi->getPaths()->addPath($path, $pathItem);
+            }
         }
 
         return $openApi;
