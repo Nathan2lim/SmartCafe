@@ -7,10 +7,9 @@ api_platform:
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
     formats:
-        jsonld: ['application/ld+json']
         json: ['application/json']
-    docs_formats:
         jsonld: ['application/ld+json']
+    docs_formats:
         jsonopenapi: ['application/vnd.openapi+json']
         html: ['text/html']
     swagger:
@@ -18,3 +17,14 @@ api_platform:
             JWT:
                 name: Authorization
                 type: header
+        swagger_ui_extra_configuration:
+            tryItOutEnabled: true
+            filter: true
+            deepLinking: true
+            displayRequestDuration: true
+            docExpansion: list
+            showExtensions: true
+            showCommonExtensions: true
+            defaultModelsExpandDepth: 2
+            defaultModelExpandDepth: 2
+            syntaxHighlight.theme: monokai

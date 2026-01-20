@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if title %}{{ title }} - {% endif %}API Documentation</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
+    <link rel="stylesheet" href="{{ asset('css/swagger-form-plugin.css') }}">
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow-y: scroll;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        body {
+            margin: 0;
+            background: #fafafa;
+        }
+        .swagger-ui .topbar {
+            display: none;
+        }
+        .swagger-ui .info {
+            margin: 30px 0;
+        }
+        .swagger-ui .info .title {
+            color: #3b4151;
+        }
+        .swagger-ui .scheme-container {
+            background: #fff;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,.15);
+        }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            window.ui = SwaggerUIBundle({
+                url: "{{ path('api_doc', {'_format': 'jsonopenapi'}) }}",
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                tryItOutEnabled: true,
+                filter: true,
+                displayRequestDuration: true,
+                docExpansion: "list",
+                showExtensions: true,
+                showCommonExtensions: true,
+                defaultModelsExpandDepth: 2,
+                defaultModelExpandDepth: 2,
+                syntaxHighlight: {
+                    theme: "monokai"
+                },
+                {% if swagger_data.oauth.enabled %}
+                oauth2RedirectUrl: "{{ oauth2_redirect_url }}",
+                initOAuth: {
+                    clientId: "{{ swagger_data.oauth.clientId }}",
+                    clientSecret: "{{ swagger_data.oauth.clientSecret }}",
+                    scopes: "{{ swagger_data.oauth.scopes|join(' ') }}",
+                    usePkceWithAuthorizationCodeGrant: {{ swagger_data.oauth.pkce ? 'true' : 'false' }}
+                },
+                {% endif %}
+                requestInterceptor: function(request) {
+                    // Add JWT token if available
+                    var token = localStorage.getItem('swagger_jwt_token');
+                    if (token) {
+                        request.headers['Authorization'] = 'Bearer ' + token;
+                    }
+                    return request;
+                },
+                responseInterceptor: function(response) {
+                    // Store JWT token from login response
+                    if (response.url && response.url.includes('/login') && response.body && response.body.token) {
+                        localStorage.setItem('swagger_jwt_token', response.body.token);
+                        alert('Token JWT enregistré ! Les prochaines requêtes seront authentifiées.');
+                    }
+                    return response;
+                }
+            });
+
+            // Add authorize button handler for manual token entry
+            setTimeout(function() {
+                var authorizeBtn = document.querySelector('.authorize');
+                if (authorizeBtn) {
+                    authorizeBtn.addEventListener('click', function() {
+                        setTimeout(function() {
+                            var tokenInput = document.querySelector('.auth-container input[type="text"]');
+                            if (tokenInput) {
+                                var savedToken = localStorage.getItem('swagger_jwt_token');
+                                if (savedToken) {
+                                    tokenInput.value = 'Bearer ' + savedToken;
+                                }
+                            }
+                        }, 100);
+                    });
+                }
+            }, 1000);
+        };
+    </script>
+    <script src="{{ asset('js/swagger-form-plugin.js') }}"></script>
+</body>
+</html>

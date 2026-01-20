@@ -10,7 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use App\Repository\UserRepository;
-use App\State\UserPasswordHasher;
+use App\State\UserStateProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -22,10 +22,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('ROLE_ADMIN')"),
-        new Post(processor: UserPasswordHasher::class),
+        new Post(processor: UserStateProcessor::class),
         new Get(security: "is_granted('ROLE_ADMIN') or object == user"),
-        new Patch(security: "is_granted('ROLE_ADMIN') or object == user", processor: UserPasswordHasher::class),
-        new Delete(security: "is_granted('ROLE_ADMIN')"),
+        new Patch(security: "is_granted('ROLE_ADMIN') or object == user", processor: UserStateProcessor::class),
+        new Delete(security: "is_granted('ROLE_ADMIN')", processor: UserStateProcessor::class),
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']],
