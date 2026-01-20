@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -13,7 +14,7 @@ use App\State\UserPasswordHasher;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -41,6 +42,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank]
     #[Assert\Email]
     #[Groups(['user:read', 'user:write'])]
+    #[ApiProperty(example: 'john.doe@smartcafe.fr')]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -52,20 +54,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Assert\NotBlank(groups: ['user:create'])]
     #[Groups(['user:write'])]
+    #[ApiProperty(example: 'MySecurePassword123!')]
     private ?string $plainPassword = null;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank]
     #[Groups(['user:read', 'user:write'])]
+    #[ApiProperty(example: 'John')]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank]
     #[Groups(['user:read', 'user:write'])]
+    #[ApiProperty(example: 'Doe')]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 20, nullable: true)]
     #[Groups(['user:read', 'user:write'])]
+    #[ApiProperty(example: '+33612345678')]
     private ?string $phone = null;
 
     #[ORM\Column]
