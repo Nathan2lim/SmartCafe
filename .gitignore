@@ -1,0 +1,19 @@
+# Symfony
+/api/var/
+/api/vendor/
+/api/.env.local
+/api/.env.*.local
+/api/config/jwt/*.pem
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
