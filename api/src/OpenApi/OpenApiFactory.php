@@ -302,6 +302,49 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     'description' => 'Token JWT à utiliser dans le header Authorization: Bearer {token}',
                     'example' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...',
                 ],
+                'refresh_token' => [
+                    'type' => 'string',
+                    'description' => 'Refresh token pour obtenir un nouveau JWT (valide 30 jours)',
+                    'example' => 'a1b2c3d4e5f6...',
+                ],
+                'refresh_token_expires_at' => [
+                    'type' => 'string',
+                    'format' => 'date-time',
+                    'description' => 'Date d\'expiration du refresh token',
+                    'example' => '2026-02-19T15:30:00+00:00',
+                ],
+            ],
+        ]);
+
+        // Schéma pour refresh token request
+        $schemas['RefreshTokenRequest'] = new ArrayObject([
+            'type' => 'object',
+            'required' => ['refresh_token'],
+            'properties' => [
+                'refresh_token' => [
+                    'type' => 'string',
+                    'description' => 'Le refresh token obtenu lors du login',
+                    'example' => 'a1b2c3d4e5f6...',
+                ],
+            ],
+        ]);
+
+        // Schéma pour les sessions actives
+        $schemas['ActiveSessions'] = new ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'sessions' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'expires_at' => ['type' => 'string', 'format' => 'date-time'],
+                            'ip_address' => ['type' => 'string', 'nullable' => true],
+                            'user_agent' => ['type' => 'string', 'nullable' => true],
+                        ],
+                    ],
+                ],
             ],
         ]);
     }
@@ -338,6 +381,100 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         );
 
         $openApi->getPaths()->addPath('/api/login', $pathItem);
+
+        // Endpoint pour refresh token
+        $refreshPathItem = new Model\PathItem(
+            post: new Model\Operation(
+                operationId: 'postTokenRefresh',
+                tags: ['Authentification'],
+                summary: 'Rafraîchir le token JWT',
+                description: 'Utilise un refresh token valide pour obtenir un nouveau JWT et un nouveau refresh token (rotation)',
+                requestBody: new Model\RequestBody(
+                    description: 'Refresh token',
+                    content: new ArrayObject([
+                        'application/json' => new Model\MediaType(
+                            schema: new ArrayObject(['$ref' => '#/components/schemas/RefreshTokenRequest']),
+                        ),
+                    ]),
+                    required: true,
+                ),
+                responses: [
+                    '200' => new Model\Response(
+                        description: 'Nouveaux tokens',
+                        content: new ArrayObject([
+                            'application/json' => new Model\MediaType(
+                                schema: new ArrayObject(['$ref' => '#/components/schemas/Token']),
+                            ),
+                        ]),
+                    ),
+                    '401' => new Model\Response(description: 'Refresh token invalide ou expiré'),
+                ],
+            ),
+        );
+        $openApi->getPaths()->addPath('/api/token/refresh', $refreshPathItem);
+
+        // Endpoint pour révoquer un token
+        $revokePathItem = new Model\PathItem(
+            post: new Model\Operation(
+                operationId: 'postTokenRevoke',
+                tags: ['Authentification'],
+                summary: 'Révoquer un refresh token',
+                description: 'Révoque un refresh token spécifique (déconnexion)',
+                requestBody: new Model\RequestBody(
+                    description: 'Refresh token à révoquer',
+                    content: new ArrayObject([
+                        'application/json' => new Model\MediaType(
+                            schema: new ArrayObject(['$ref' => '#/components/schemas/RefreshTokenRequest']),
+                        ),
+                    ]),
+                    required: true,
+                ),
+                responses: [
+                    '200' => new Model\Response(description: 'Token révoqué avec succès'),
+                    '400' => new Model\Response(description: 'Token invalide'),
+                ],
+            ),
+        );
+        $openApi->getPaths()->addPath('/api/token/revoke', $revokePathItem);
+
+        // Endpoint pour révoquer tous les tokens
+        $revokeAllPathItem = new Model\PathItem(
+            post: new Model\Operation(
+                operationId: 'postTokenRevokeAll',
+                tags: ['Authentification'],
+                summary: 'Révoquer tous les refresh tokens',
+                description: 'Révoque tous les refresh tokens de l\'utilisateur (déconnexion de tous les appareils)',
+                security: [['bearerAuth' => []]],
+                responses: [
+                    '200' => new Model\Response(description: 'Tous les tokens révoqués'),
+                    '401' => new Model\Response(description: 'Non authentifié'),
+                ],
+            ),
+        );
+        $openApi->getPaths()->addPath('/api/token/revoke-all', $revokeAllPathItem);
+
+        // Endpoint pour voir les sessions actives
+        $sessionsPathItem = new Model\PathItem(
+            get: new Model\Operation(
+                operationId: 'getAuthSessions',
+                tags: ['Authentification'],
+                summary: 'Voir les sessions actives',
+                description: 'Retourne la liste des sessions actives (refresh tokens valides) pour l\'utilisateur connecté',
+                security: [['bearerAuth' => []]],
+                responses: [
+                    '200' => new Model\Response(
+                        description: 'Liste des sessions actives',
+                        content: new ArrayObject([
+                            'application/json' => new Model\MediaType(
+                                schema: new ArrayObject(['$ref' => '#/components/schemas/ActiveSessions']),
+                            ),
+                        ]),
+                    ),
+                    '401' => new Model\Response(description: 'Non authentifié'),
+                ],
+            ),
+        );
+        $openApi->getPaths()->addPath('/api/auth/sessions', $sessionsPathItem);
 
         return $openApi;
     }
