@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\RefreshToken;
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -26,7 +27,7 @@ class RefreshTokenRepository extends ServiceEntityRepository
             ->andWhere('rt.revoked = false')
             ->andWhere('rt.expiresAt > :now')
             ->setParameter('token', $token)
-            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('now', new DateTimeImmutable())
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -48,7 +49,7 @@ class RefreshTokenRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('rt')
             ->delete()
             ->andWhere('rt.expiresAt < :now')
-            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('now', new DateTimeImmutable())
             ->getQuery()
             ->execute();
     }
@@ -60,7 +61,7 @@ class RefreshTokenRepository extends ServiceEntityRepository
             ->andWhere('rt.revoked = false')
             ->andWhere('rt.expiresAt > :now')
             ->setParameter('user', $user)
-            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('now', new DateTimeImmutable())
             ->orderBy('rt.createdAt', 'DESC')
             ->getQuery()
             ->getResult();

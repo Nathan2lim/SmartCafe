@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Service\Auth\RefreshTokenService;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,7 +38,7 @@ class AuthController extends AbstractController
             $tokens = $this->refreshTokenService->refresh($refreshToken);
 
             return $this->json($tokens);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return $this->json([
                 'error' => $e->getMessage(),
             ], Response::HTTP_UNAUTHORIZED);

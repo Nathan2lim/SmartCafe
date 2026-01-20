@@ -8,6 +8,7 @@ use App\Entity\RefreshToken;
 use App\Entity\User;
 use App\Repository\RefreshTokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -47,14 +48,14 @@ class RefreshTokenService
      *
      * @return array{token: string, refresh_token: string}
      *
-     * @throws \InvalidArgumentException if refresh token is invalid
+     * @throws InvalidArgumentException if refresh token is invalid
      */
     public function refresh(string $refreshTokenString): array
     {
         $refreshToken = $this->refreshTokenRepository->findValidByToken($refreshTokenString);
 
         if (!$refreshToken) {
-            throw new \InvalidArgumentException('Invalid or expired refresh token');
+            throw new InvalidArgumentException('Invalid or expired refresh token');
         }
 
         $user = $refreshToken->getUser();

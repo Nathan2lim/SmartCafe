@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\RefreshTokenRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -27,10 +28,10 @@ class RefreshToken
     private User $user;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private \DateTimeImmutable $expiresAt;
+    private DateTimeImmutable $expiresAt;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: Types::STRING, length: 45, nullable: true)]
     private ?string $ipAddress = null;
@@ -43,7 +44,7 @@ class RefreshToken
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public static function create(User $user, int $ttlSeconds = 2592000): self // 30 days default
@@ -51,7 +52,7 @@ class RefreshToken
         $refreshToken = new self();
         $refreshToken->token = bin2hex(random_bytes(64));
         $refreshToken->user = $user;
-        $refreshToken->expiresAt = new \DateTimeImmutable("+{$ttlSeconds} seconds");
+        $refreshToken->expiresAt = new DateTimeImmutable("+{$ttlSeconds} seconds");
 
         return $refreshToken;
     }
@@ -71,12 +72,12 @@ class RefreshToken
         return $this->user;
     }
 
-    public function getExpiresAt(): \DateTimeImmutable
+    public function getExpiresAt(): DateTimeImmutable
     {
         return $this->expiresAt;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -119,6 +120,6 @@ class RefreshToken
 
     public function isValid(): bool
     {
-        return !$this->revoked && $this->expiresAt > new \DateTimeImmutable();
+        return !$this->revoked && $this->expiresAt > new DateTimeImmutable();
     }
 }

@@ -20,8 +20,8 @@ class ProductApiTest extends ApiTestCase
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
 
         $data = $response->toArray();
-        $this->assertArrayHasKey('hydra:member', $data);
-        $this->assertCount(2, $data['hydra:member']);
+        $this->assertArrayHasKey('member', $data);
+        $this->assertCount(2, $data['member']);
     }
 
     public function testGetSingleProduct(): void

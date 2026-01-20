@@ -46,8 +46,8 @@ class LoyaltyApiTest extends ApiTestCase
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        $this->assertArrayHasKey('hydra:member', $data);
-        $this->assertCount(2, $data['hydra:member']);
+        $this->assertArrayHasKey('member', $data);
+        $this->assertCount(2, $data['member']);
     }
 
     public function testRedeemRewardSuccess(): void
@@ -64,8 +64,9 @@ class LoyaltyApiTest extends ApiTestCase
         $this->assertEquals('redeem', $data['type']);
 
         // Verify points were deducted
-        $this->entityManager->refresh($account);
-        $this->assertEquals(400, $account->getPoints());
+        $this->entityManager->clear();
+        $updatedAccount = $this->entityManager->find(LoyaltyAccount::class, $account->getId());
+        $this->assertEquals(400, $updatedAccount->getPoints());
     }
 
     public function testRedeemRewardInsufficientPoints(): void
