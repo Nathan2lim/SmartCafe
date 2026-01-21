@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Service\Auth\RefreshTokenService;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,57 +18,80 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 #[Route('/api')]
 class AuthController extends AbstractController
 {
+    private const COOKIE_NAME = 'refresh_token';
+    private const COOKIE_PATH = '/api/token';
+
     public function __construct(
         private readonly RefreshTokenService $refreshTokenService,
+        private readonly string $appEnv = 'prod',
     ) {
     }
 
     #[Route('/token/refresh', name: 'api_token_refresh', methods: ['POST'])]
     public function refresh(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $refreshToken = $data['refresh_token'] ?? null;
+        $refreshToken = $request->cookies->get(self::COOKIE_NAME);
 
         if (!$refreshToken) {
             return $this->json([
-                'error' => 'Missing refresh_token',
+                'error' => 'Missing refresh_token cookie',
             ], Response::HTTP_BAD_REQUEST);
         }
 
         try {
             $tokens = $this->refreshTokenService->refresh($refreshToken);
 
-            return $this->json($tokens);
+            $response = $this->json([
+                'token' => $tokens['token'],
+                'refresh_token_expires_at' => $tokens['refresh_token_expires_at'],
+            ]);
+
+            $expiresAt = new \DateTimeImmutable($tokens['refresh_token_expires_at']);
+            $cookie = new Cookie(
+                self::COOKIE_NAME,
+                $tokens['refresh_token'],
+                $expiresAt,
+                self::COOKIE_PATH,
+                null,
+                $this->appEnv === 'prod',
+                true,
+                false,
+                Cookie::SAMESITE_STRICT
+            );
+            $response->headers->setCookie($cookie);
+
+            return $response;
         } catch (InvalidArgumentException $e) {
-            return $this->json([
+            $response = $this->json([
                 'error' => $e->getMessage(),
             ], Response::HTTP_UNAUTHORIZED);
+
+            $response->headers->clearCookie(self::COOKIE_NAME, self::COOKIE_PATH);
+
+            return $response;
         }
     }
 
     #[Route('/token/revoke', name: 'api_token_revoke', methods: ['POST'])]
     public function revoke(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $refreshToken = $data['refresh_token'] ?? null;
+        $refreshToken = $request->cookies->get(self::COOKIE_NAME);
 
         if (!$refreshToken) {
             return $this->json([
-                'error' => 'Missing refresh_token',
+                'error' => 'Missing refresh_token cookie',
             ], Response::HTTP_BAD_REQUEST);
         }
 
         $revoked = $this->refreshTokenService->revokeToken($refreshToken);
 
-        if (!$revoked) {
-            return $this->json([
-                'error' => 'Invalid refresh token',
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        return $this->json([
-            'message' => 'Token revoked successfully',
+        $response = $this->json([
+            'message' => $revoked ? 'Token revoked successfully' : 'Token already revoked or invalid',
         ]);
+
+        $response->headers->clearCookie(self::COOKIE_NAME, self::COOKIE_PATH);
+
+        return $response;
     }
 
     #[Route('/token/revoke-all', name: 'api_token_revoke_all', methods: ['POST'])]
@@ -81,10 +105,14 @@ class AuthController extends AbstractController
 
         $count = $this->refreshTokenService->revokeAllForUser($user);
 
-        return $this->json([
+        $response = $this->json([
             'message' => "Revoked {$count} active sessions",
             'revoked_count' => $count,
         ]);
+
+        $response->headers->clearCookie(self::COOKIE_NAME, self::COOKIE_PATH);
+
+        return $response;
     }
 
     #[Route('/auth/sessions', name: 'api_auth_sessions', methods: ['GET'])]

@@ -30,3 +30,11 @@ services:
     App\State\ExtraStateProcessor:
         arguments:
             $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+
+    App\EventSubscriber\JwtCreatedSubscriber:
+        arguments:
+            $appEnv: '%kernel.environment%'
+
+    App\Controller\AuthController:
+        arguments:
+            $appEnv: '%kernel.environment%'
