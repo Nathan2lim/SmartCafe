@@ -1,0 +1,198 @@
+{
+	"info": {
+		"_postman_id": "smartcafe-auth-collection",
+		"name": "SmartCafe API",
+		"description": "Collection pour tester l'authentification JWT avec cookies",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('Login successful', function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData).to.have.property('refresh_token_expires_at');",
+									"    });",
+									"    ",
+									"    pm.test('JWT cookie is set', function () {",
+									"        var cookies = pm.response.headers.get('Set-Cookie');",
+									"        pm.expect(cookies).to.include('jwt_token');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "login"]
+						},
+						"description": "Authentification - retourne les cookies jwt_token et refresh_token"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('Token refreshed', function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData.message).to.equal('Token refreshed successfully');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/token/refresh",
+							"host": ["{{base_url}}"],
+							"path": ["api", "token", "refresh"]
+						},
+						"description": "Rafraîchit le JWT en utilisant le cookie refresh_token"
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Token (Logout)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/token/revoke",
+							"host": ["{{base_url}}"],
+							"path": ["api", "token", "revoke"]
+						},
+						"description": "Révoque le refresh token actuel et supprime les cookies"
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke All Tokens",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/token/revoke-all",
+							"host": ["{{base_url}}"],
+							"path": ["api", "token", "revoke-all"]
+						},
+						"description": "Révoque tous les refresh tokens de l'utilisateur (logout de tous les appareils)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Sessions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/sessions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "sessions"]
+						},
+						"description": "Liste toutes les sessions actives de l'utilisateur"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "me"]
+						},
+						"description": "Retourne les informations de l'utilisateur connecté"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newuser@example.com\",\n    \"password\": \"password123\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"+33612345678\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": ["{{base_url}}"],
+							"path": ["api", "users"]
+						},
+						"description": "Créer un nouvel utilisateur"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": ["{{base_url}}"],
+							"path": ["api", "products"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

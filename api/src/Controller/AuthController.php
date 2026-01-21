@@ -20,9 +20,6 @@ class AuthController extends AbstractController
 {
     private const REFRESH_TOKEN_COOKIE = 'refresh_token';
     private const REFRESH_TOKEN_PATH = '/api/token';
-    private const JWT_COOKIE = 'jwt_token';
-    private const JWT_PATH = '/api';
-    private const JWT_TTL = 3600;
 
     public function __construct(
         private readonly RefreshTokenService $refreshTokenService,
@@ -43,26 +40,11 @@ class AuthController extends AbstractController
 
         try {
             $tokens = $this->refreshTokenService->refresh($refreshToken);
-            $isSecure = $this->appEnv === 'prod';
 
             $response = $this->json([
-                'message' => 'Token refreshed successfully',
+                'token' => $tokens['token'],
                 'refresh_token_expires_at' => $tokens['refresh_token_expires_at'],
             ]);
-
-            // JWT cookie
-            $jwtCookie = new Cookie(
-                self::JWT_COOKIE,
-                $tokens['token'],
-                time() + self::JWT_TTL,
-                self::JWT_PATH,
-                null,
-                $isSecure,
-                true,
-                false,
-                Cookie::SAMESITE_STRICT
-            );
-            $response->headers->setCookie($jwtCookie);
 
             // Refresh token cookie
             $expiresAt = new \DateTimeImmutable($tokens['refresh_token_expires_at']);
@@ -72,7 +54,7 @@ class AuthController extends AbstractController
                 $expiresAt,
                 self::REFRESH_TOKEN_PATH,
                 null,
-                $isSecure,
+                $this->appEnv === 'prod',
                 true,
                 false,
                 Cookie::SAMESITE_STRICT
@@ -85,7 +67,7 @@ class AuthController extends AbstractController
                 'error' => $e->getMessage(),
             ], Response::HTTP_UNAUTHORIZED);
 
-            $this->clearAuthCookies($response);
+            $response->headers->clearCookie(self::REFRESH_TOKEN_COOKIE, self::REFRESH_TOKEN_PATH);
 
             return $response;
         }
@@ -108,7 +90,7 @@ class AuthController extends AbstractController
             'message' => $revoked ? 'Token revoked successfully' : 'Token already revoked or invalid',
         ]);
 
-        $this->clearAuthCookies($response);
+        $response->headers->clearCookie(self::REFRESH_TOKEN_COOKIE, self::REFRESH_TOKEN_PATH);
 
         return $response;
     }
@@ -129,7 +111,7 @@ class AuthController extends AbstractController
             'revoked_count' => $count,
         ]);
 
-        $this->clearAuthCookies($response);
+        $response->headers->clearCookie(self::REFRESH_TOKEN_COOKIE, self::REFRESH_TOKEN_PATH);
 
         return $response;
     }
@@ -153,11 +135,5 @@ class AuthController extends AbstractController
                 'user_agent' => $session->getUserAgent(),
             ], $sessions),
         ]);
-    }
-
-    private function clearAuthCookies(JsonResponse $response): void
-    {
-        $response->headers->clearCookie(self::JWT_COOKIE, self::JWT_PATH);
-        $response->headers->clearCookie(self::REFRESH_TOKEN_COOKIE, self::REFRESH_TOKEN_PATH);
     }
 }

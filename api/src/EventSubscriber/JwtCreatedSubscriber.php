@@ -15,9 +15,6 @@ class JwtCreatedSubscriber implements EventSubscriberInterface
 {
     private const REFRESH_TOKEN_COOKIE = 'refresh_token';
     private const REFRESH_TOKEN_PATH = '/api/token';
-    private const JWT_COOKIE = 'jwt_token';
-    private const JWT_PATH = '/api';
-    private const JWT_TTL = 3600;
 
     public function __construct(
         private readonly RefreshTokenService $refreshTokenService,
@@ -42,24 +39,6 @@ class JwtCreatedSubscriber implements EventSubscriberInterface
 
         $response = $event->getResponse();
         $data = $event->getData();
-        $isSecure = $this->appEnv === 'prod';
-
-        // JWT cookie
-        $jwtToken = $data['token'] ?? null;
-        if ($jwtToken) {
-            $jwtCookie = new Cookie(
-                self::JWT_COOKIE,
-                $jwtToken,
-                time() + self::JWT_TTL,
-                self::JWT_PATH,
-                null,
-                $isSecure,
-                true,
-                false,
-                Cookie::SAMESITE_STRICT
-            );
-            $response->headers->setCookie($jwtCookie);
-        }
 
         // Refresh token cookie
         $refreshToken = $this->refreshTokenService->createRefreshToken($user);
@@ -69,15 +48,14 @@ class JwtCreatedSubscriber implements EventSubscriberInterface
             $refreshToken->getExpiresAt(),
             self::REFRESH_TOKEN_PATH,
             null,
-            $isSecure,
+            $this->appEnv === 'prod',
             true,
             false,
             Cookie::SAMESITE_STRICT
         );
         $response->headers->setCookie($refreshCookie);
 
-        // Remove tokens from response body, keep only expiration info
-        unset($data['token']);
+        // JWT stays in body, add refresh token expiration
         $data['refresh_token_expires_at'] = $refreshToken->getExpiresAt()->format('c');
         $event->setData($data);
     }

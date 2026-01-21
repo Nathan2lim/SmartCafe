@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartCafe - Documentation Technique</title>
+    <style>
+        :root {
+            --primary: #4a2c2a;
+            --secondary: #8b5a2b;
+            --accent: #d4a574;
+            --bg: #faf7f2;
+            --text: #333;
+            --code-bg: #2d2d2d;
+            --border: #e0d5c7;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        header .version {
+            background: var(--accent);
+            color: var(--primary);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        nav a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        nav a:hover {
+            background: var(--accent);
+            color: white;
+        }
+        section {
+            background: white;
+            margin: 20px 0;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: var(--secondary);
+            margin: 20px 0 10px;
+        }
+        h4 {
+            color: var(--primary);
+            margin: 15px 0 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        th {
+            background: var(--primary);
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #faf7f2;
+        }
+        code {
+            background: var(--code-bg);
+            color: #f8f8f2;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+        }
+        pre {
+            background: var(--code-bg);
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        pre code {
+            padding: 0;
+            background: none;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .badge-public { background: #28a745; color: white; }
+        .badge-auth { background: #ffc107; color: #333; }
+        .badge-admin { background: #dc3545; color: white; }
+        .badge-get { background: #61affe; color: white; }
+        .badge-post { background: #49cc90; color: white; }
+        .badge-patch { background: #fca130; color: white; }
+        .badge-delete { background: #f93e3e; color: white; }
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .card-title {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .flow-diagram {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: monospace;
+        }
+        .arrow {
+            color: var(--secondary);
+            font-size: 1.2em;
+        }
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        li {
+            margin: 5px 0;
+        }
+        .highlight {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SmartCafe</h1>
+        <p>Documentation Technique</p>
+        <span class="version">v1.0.0</span>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#technologies">Technologies</a></li>
+            <li><a href="#entites">Entites</a></li>
+            <li><a href="#regles">Regles Metier</a></li>
+            <li><a href="#api">API Routes</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#securite">Securite</a></li>
+            <li><a href="#tests">Tests</a></li>
+            <li><a href="#commandes">Commandes</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- ARCHITECTURE -->
+        <section id="architecture">
+            <h2>Architecture du Projet</h2>
+
+            <h3>Structure des dossiers</h3>
+            <pre><code>SmartCafe/
+├── api/                          # Backend API Symfony
+│   ├── config/                   # Configuration Symfony
+│   │   ├── packages/             # Bundles config (doctrine, security, jwt...)
+│   │   └── routes.yaml           # Routes personnalisees
+│   ├── migrations/               # Migrations Doctrine
+│   ├── src/
+│   │   ├── Controller/           # Controllers (AuthController)
+│   │   ├── DataFixtures/         # Donnees de test
+│   │   ├── DTO/                  # Data Transfer Objects
+│   │   ├── Entity/               # Entites Doctrine (11 entites)
+│   │   ├── Enum/                 # Enumerations (OrderStatus, etc.)
+│   │   ├── EventSubscriber/      # Subscribers (JWT)
+│   │   ├── Exception/            # Exceptions metier
+│   │   ├── Repository/           # Repositories Doctrine
+│   │   ├── Service/              # Services metier
+│   │   │   ├── Auth/             # RefreshTokenService
+│   │   │   ├── Loyalty/          # LoyaltyService
+│   │   │   ├── Order/            # OrderService
+│   │   │   ├── Stock/            # StockService
+│   │   │   └── User/             # UserService
+│   │   └── State/                # Processors/Providers API Platform
+│   └── tests/                    # Tests PHPUnit
+├── docker/                       # Configuration Docker
+│   ├── nginx/default.conf
+│   └── php/Dockerfile
+├── docs/                         # Documentation
+├── docker-compose.yml            # Orchestration
+├── Makefile                      # Commandes utiles
+└── README.md</code></pre>
+
+            <h3>Architecture Globale</h3>
+            <div class="flow-diagram">
+                <pre>
+    Client (Browser/Mobile)
+           │
+           ▼
+    ┌─────────────────┐
+    │  Nginx (8080)   │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │ PHP-FPM (9000)  │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────────────────────────┐
+    │         Symfony Kernel               │
+    │  ┌─────────────────────────────────┐│
+    │  │     AuthController (JWT)        ││
+    │  │            │                    ││
+    │  │     API Platform                ││
+    │  │            │                    ││
+    │  │     State Processors            ││
+    │  │            │                    ││
+    │  │     Services (Business Logic)   ││
+    │  │            │                    ││
+    │  │     Doctrine ORM                ││
+    │  └─────────────────────────────────┘│
+    └────────────────┬────────────────────┘
+                     │
+                     ▼
+           ┌─────────────────┐
+           │ PostgreSQL (5432)│
+           └─────────────────┘
+                </pre>
+            </div>
+
+            <h3>Patterns Utilises</h3>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Repository Pattern</div>
+                    <p>Abstraction de l'acces aux donnees via Doctrine ORM</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Service Layer Pattern</div>
+                    <p>Logique metier encapsulee dans des services dedies</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">State Processor Pattern</div>
+                    <p>API Platform processors pour les operations CRUD</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">DTO Pattern</div>
+                    <p>Objets de transfert pour l'API</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TECHNOLOGIES -->
+        <section id="technologies">
+            <h2>Technologies</h2>
+
+            <h3>Stack Principal</h3>
+            <table>
+                <tr>
+                    <th>Composant</th>
+                    <th>Technologie</th>
+                    <th>Version</th>
+                </tr>
+                <tr>
+                    <td>Framework</td>
+                    <td>Symfony</td>
+                    <td>8.0.*</td>
+                </tr>
+                <tr>
+                    <td>Langage</td>
+                    <td>PHP</td>
+                    <td>>= 8.2 (Docker: 8.4)</td>
+                </tr>
+                <tr>
+                    <td>Base de donnees</td>
+                    <td>PostgreSQL</td>
+                    <td>15-alpine</td>
+                </tr>
+                <tr>
+                    <td>API Framework</td>
+                    <td>API Platform</td>
+                    <td>4.2</td>
+                </tr>
+                <tr>
+                    <td>ORM</td>
+                    <td>Doctrine</td>
+                    <td>3.6</td>
+                </tr>
+                <tr>
+                    <td>Authentification</td>
+                    <td>Lexik JWT Bundle</td>
+                    <td>3.2</td>
+                </tr>
+                <tr>
+                    <td>Serveur Web</td>
+                    <td>Nginx</td>
+                    <td>Alpine</td>
+                </tr>
+            </table>
+
+            <h3>Outils de Qualite</h3>
+            <table>
+                <tr>
+                    <th>Outil</th>
+                    <th>Usage</th>
+                </tr>
+                <tr>
+                    <td>PHPUnit 11.0</td>
+                    <td>Tests unitaires et fonctionnels</td>
+                </tr>
+                <tr>
+                    <td>PHPStan 2.0</td>
+                    <td>Analyse statique du code</td>
+                </tr>
+                <tr>
+                    <td>PHP-CS-Fixer 3.64</td>
+                    <td>Style de code</td>
+                </tr>
+                <tr>
+                    <td>Doctrine Fixtures</td>
+                    <td>Donnees de test</td>
+                </tr>
+                <tr>
+                    <td>Zenstruck Foundry 2.0</td>
+                    <td>Factories pour tests</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- ENTITES -->
+        <section id="entites">
+            <h2>Modele de Donnees</h2>
+
+            <h3>Diagramme des Entites</h3>
+            <pre><code>┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│      User        │     │   LoyaltyAccount │     │ LoyaltyTransaction│
+├──────────────────┤     ├──────────────────┤     ├──────────────────┤
+│ id               │1───1│ id               │1───*│ id               │
+│ email (unique)   │     │ points           │     │ type (enum)      │
+│ password         │     │ totalPointsEarned│     │ points           │
+│ firstName        │     │ totalPointsSpent │     │ description      │
+│ lastName         │     │ tier (enum)      │     │ createdAt        │
+│ phone            │     │ createdAt        │     │ order_id?        │
+│ roles[]          │     └──────────────────┘     │ reward_id?       │
+│ createdAt        │                              └──────────────────┘
+└────────┬─────────┘
+         │1
+         │
+         │*
+┌────────▼─────────┐     ┌──────────────────┐     ┌──────────────────┐
+│      Order       │     │    OrderItem     │     │  OrderItemExtra  │
+├──────────────────┤     ├──────────────────┤     ├──────────────────┤
+│ id               │1───*│ id               │1───*│ id               │
+│ orderNumber      │     │ quantity         │     │ quantity         │
+│ status (enum)    │     │ unitPrice        │     │ unitPrice        │
+│ totalAmount      │     │ specialInstructions    └────────┬─────────┘
+│ notes            │     │ product_id       │              │*
+│ tableNumber      │     └────────┬─────────┘              │
+│ createdAt        │              │*                       │1
+│ confirmedAt      │              │                 ┌──────▼──────────┐
+│ readyAt          │              │1                │     Extra       │
+│ deliveredAt      │       ┌──────▼──────────┐     ├──────────────────┤
+└──────────────────┘       │    Product      │     │ id               │
+                           ├──────────────────┤     │ name             │
+                           │ id               │     │ price            │
+                           │ name             │     │ stockQuantity    │
+                           │ price            │     │ lowStockThreshold│
+                           │ category         │     │ available        │
+                           │ available        │     └──────────────────┘
+                           │ alaCarte         │              │1
+                           │ imageUrl         │              │
+                           │ stockQuantity    │              │*
+                           │ lowStockThreshold│     ┌────────▼─────────┐
+                           └────────┬─────────┘     │  ProductExtra    │
+                                    │1              ├──────────────────┤
+                                    │               │ id               │
+                                    │*              │ maxQuantity      │
+                           ┌────────▼─────────┐     │ product_id       │
+                           │  ProductExtra    │─────│ extra_id         │
+                           └──────────────────┘     └──────────────────┘
+
+┌──────────────────┐     ┌──────────────────┐
+│  LoyaltyReward   │     │  RefreshToken    │
+├──────────────────┤     ├──────────────────┤
+│ id               │     │ id               │
+│ name             │     │ token (unique)   │
+│ pointsCost       │     │ expiresAt        │
+│ type (enum)      │     │ createdAt        │
+│ discountValue    │     │ ipAddress        │
+│ discountPercent  │     │ userAgent        │
+│ freeProduct_id?  │     │ revoked          │
+│ requiredTier     │     │ user_id          │
+│ active           │     └──────────────────┘
+│ stockQuantity    │
+└──────────────────┘</code></pre>
+
+            <h3>Detail des Entites</h3>
+
+            <h4>User</h4>
+            <table>
+                <tr><th>Champ</th><th>Type</th><th>Contraintes</th></tr>
+                <tr><td>id</td><td>int</td><td>Auto-generated</td></tr>
+                <tr><td>email</td><td>string(180)</td><td>Unique, NotBlank, Email</td></tr>
+                <tr><td>password</td><td>string</td><td>NotBlank, Min 6 chars</td></tr>
+                <tr><td>firstName</td><td>string(100)</td><td>NotBlank</td></tr>
+                <tr><td>lastName</td><td>string(100)</td><td>NotBlank</td></tr>
+                <tr><td>phone</td><td>string(20)</td><td>Nullable</td></tr>
+                <tr><td>roles</td><td>array</td><td>Default: ROLE_USER</td></tr>
+                <tr><td>createdAt</td><td>datetime</td><td>Auto-set</td></tr>
+            </table>
+
+            <h4>Product</h4>
+            <table>
+                <tr><th>Champ</th><th>Type</th><th>Contraintes</th></tr>
+                <tr><td>id</td><td>int</td><td>Auto-generated</td></tr>
+                <tr><td>name</td><td>string(255)</td><td>NotBlank</td></tr>
+                <tr><td>price</td><td>decimal(10,2)</td><td>Positive</td></tr>
+                <tr><td>category</td><td>string(100)</td><td>NotBlank</td></tr>
+                <tr><td>available</td><td>boolean</td><td>Default: true</td></tr>
+                <tr><td>alaCarte</td><td>boolean</td><td>Default: true</td></tr>
+                <tr><td>imageUrl</td><td>string</td><td>Nullable, URL</td></tr>
+                <tr><td>stockQuantity</td><td>int</td><td>Nullable, PositiveOrZero</td></tr>
+                <tr><td>lowStockThreshold</td><td>int</td><td>Default: 10</td></tr>
+            </table>
+
+            <h4>Order</h4>
+            <table>
+                <tr><th>Champ</th><th>Type</th><th>Contraintes</th></tr>
+                <tr><td>id</td><td>int</td><td>Auto-generated</td></tr>
+                <tr><td>orderNumber</td><td>string</td><td>Unique, Auto-generated</td></tr>
+                <tr><td>status</td><td>OrderStatus</td><td>Enum</td></tr>
+                <tr><td>totalAmount</td><td>decimal(10,2)</td><td>Calculated</td></tr>
+                <tr><td>notes</td><td>text</td><td>Nullable</td></tr>
+                <tr><td>tableNumber</td><td>string(20)</td><td>Nullable</td></tr>
+                <tr><td>createdAt</td><td>datetime</td><td>Auto-set</td></tr>
+                <tr><td>confirmedAt</td><td>datetime</td><td>Nullable</td></tr>
+                <tr><td>readyAt</td><td>datetime</td><td>Nullable</td></tr>
+                <tr><td>deliveredAt</td><td>datetime</td><td>Nullable</td></tr>
+            </table>
+
+            <h4>LoyaltyAccount</h4>
+            <table>
+                <tr><th>Champ</th><th>Type</th><th>Contraintes</th></tr>
+                <tr><td>id</td><td>int</td><td>Auto-generated</td></tr>
+                <tr><td>points</td><td>int</td><td>Default: 0</td></tr>
+                <tr><td>totalPointsEarned</td><td>int</td><td>Default: 0</td></tr>
+                <tr><td>totalPointsSpent</td><td>int</td><td>Default: 0</td></tr>
+                <tr><td>tier</td><td>string</td><td>bronze/silver/gold/platinum</td></tr>
+                <tr><td>createdAt</td><td>datetime</td><td>Auto-set</td></tr>
+            </table>
+
+            <h3>Enumerations</h3>
+
+            <h4>OrderStatus</h4>
+            <pre><code>enum OrderStatus: string {
+    case PENDING = 'pending';       // Commande creee, en attente
+    case CONFIRMED = 'confirmed';   // Confirmee, stock deduit
+    case PREPARING = 'preparing';   // En preparation
+    case READY = 'ready';           // Prete a servir
+    case DELIVERED = 'delivered';   // Livree, points attribues
+    case CANCELLED = 'cancelled';   // Annulee, stock restaure
+}</code></pre>
+
+            <div class="info">
+                <strong>Transitions de statut autorisees:</strong>
+                <ul>
+                    <li>PENDING → CONFIRMED, CANCELLED</li>
+                    <li>CONFIRMED → PREPARING, CANCELLED</li>
+                    <li>PREPARING → READY, CANCELLED</li>
+                    <li>READY → DELIVERED, CANCELLED</li>
+                    <li>DELIVERED → (final)</li>
+                    <li>CANCELLED → (final)</li>
+                </ul>
+            </div>
+
+            <h4>LoyaltyTransactionType</h4>
+            <pre><code>enum LoyaltyTransactionType: string {
+    case EARN = 'earn';           // Points gagnes sur commande
+    case REDEEM = 'redeem';       // Points utilises pour recompense
+    case BONUS = 'bonus';         // Points bonus
+    case EXPIRED = 'expired';     // Points expires
+    case ADJUSTMENT = 'adjustment'; // Ajustement manuel
+}</code></pre>
+
+            <h4>RewardType</h4>
+            <pre><code>enum RewardType: string {
+    case FREE_PRODUCT = 'free_product';       // Produit offert
+    case DISCOUNT_AMOUNT = 'discount_amount'; // Reduction en euros
+    case DISCOUNT_PERCENT = 'discount_percent'; // Reduction en %
+    case FREE_EXTRA = 'free_extra';           // Extra offert
+    case DOUBLE_POINTS = 'double_points';     // Points doubles
+}</code></pre>
+        </section>
+
+        <!-- REGLES METIER -->
+        <section id="regles">
+            <h2>Regles de Gestion Metier</h2>
+
+            <h3>Gestion des Commandes</h3>
+            <div class="card">
+                <div class="card-title">RG-CMD-001: Generation du numero de commande</div>
+                <p>Format: <code>ORD-YYYYMMDD-XXXXXXXX</code> (8 caracteres aleatoires)</p>
+                <p>Exemple: <code>ORD-20260121-a3f8b2c1</code></p>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-CMD-002: Calcul du total</div>
+                <p>Le total est calcule automatiquement:</p>
+                <pre><code>totalAmount = SUM(item.quantity * item.unitPrice)
+            + SUM(itemExtra.quantity * itemExtra.unitPrice)</code></pre>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-CMD-003: Verification du stock</div>
+                <p>Avant creation d'une commande, verifier que:</p>
+                <ul>
+                    <li>Chaque produit a un stock suffisant (si gere)</li>
+                    <li>Chaque extra a un stock suffisant (si gere)</li>
+                </ul>
+                <p>Si stock insuffisant: erreur 400 avec detail</p>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-CMD-004: Deduction du stock</div>
+                <p>Le stock est deduit uniquement lors du passage au statut <code>CONFIRMED</code></p>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-CMD-005: Restauration du stock</div>
+                <p>Le stock est restaure lors du passage au statut <code>CANCELLED</code></p>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-CMD-006: Attribution des points</div>
+                <p>Les points de fidelite sont attribues uniquement lors du passage au statut <code>DELIVERED</code></p>
+            </div>
+
+            <h3>Systeme de Fidelite</h3>
+            <div class="card">
+                <div class="card-title">RG-FID-001: Points par euro</div>
+                <p>Base: <strong>10 points par euro depense</strong></p>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-FID-002: Multiplicateurs par tier</div>
+                <table>
+                    <tr><th>Tier</th><th>Multiplicateur</th><th>Points requis</th></tr>
+                    <tr><td>Bronze</td><td>1.0x</td><td>0 - 499</td></tr>
+                    <tr><td>Silver</td><td>1.25x</td><td>500 - 1999</td></tr>
+                    <tr><td>Gold</td><td>1.5x</td><td>2000 - 4999</td></tr>
+                    <tr><td>Platinum</td><td>2.0x</td><td>5000+</td></tr>
+                </table>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-FID-003: Calcul des points</div>
+                <pre><code>pointsGagnes = floor(totalAmount * POINTS_PAR_EURO * multiplicateurTier)</code></pre>
+                <p>Exemple: Commande 15.50EUR, tier Silver</p>
+                <pre><code>points = floor(15.50 * 10 * 1.25) = floor(193.75) = 193 points</code></pre>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-FID-004: Mise a jour du tier</div>
+                <p>Le tier est recalcule apres chaque transaction basee sur <code>totalPointsEarned</code></p>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-FID-005: Echange de recompense</div>
+                <ul>
+                    <li>L'utilisateur doit avoir suffisamment de points</li>
+                    <li>L'utilisateur doit avoir le tier requis (si applicable)</li>
+                    <li>La recompense doit etre active</li>
+                    <li>La recompense doit etre en stock (si applicable)</li>
+                </ul>
+            </div>
+
+            <h3>Gestion du Stock</h3>
+            <div class="card">
+                <div class="card-title">RG-STK-001: Stock optionnel</div>
+                <p>Si <code>stockQuantity = null</code>, le produit/extra est considere comme toujours disponible</p>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-STK-002: Seuil d'alerte</div>
+                <p>Un produit/extra est considere en stock faible si:</p>
+                <pre><code>stockQuantity <= lowStockThreshold</code></pre>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-STK-003: Disponibilite automatique</div>
+                <p>Un produit/extra devient automatiquement indisponible si <code>stockQuantity = 0</code></p>
+            </div>
+
+            <h3>Gestion des Extras</h3>
+            <div class="card">
+                <div class="card-title">RG-EXT-001: Association produit-extra</div>
+                <p>Un extra ne peut etre ajoute a un produit que s'il existe une association <code>ProductExtra</code></p>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-EXT-002: Quantite maximale</div>
+                <p>La quantite d'un extra sur un item de commande ne peut pas depasser le <code>maxQuantity</code> defini dans <code>ProductExtra</code></p>
+            </div>
+
+            <h3>Authentification</h3>
+            <div class="card">
+                <div class="card-title">RG-AUTH-001: Creation de compte</div>
+                <p>A la creation d'un utilisateur:</p>
+                <ul>
+                    <li>Un compte de fidelite est automatiquement cree</li>
+                    <li>Le role par defaut est <code>ROLE_USER</code></li>
+                    <li>Le mot de passe doit faire minimum 6 caracteres</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-title">RG-AUTH-002: Refresh Token</div>
+                <ul>
+                    <li>Duree de validite: 30 jours</li>
+                    <li>Stocke en cookie HttpOnly</li>
+                    <li>Tracking IP et User-Agent</li>
+                    <li>Possibilite de revoquer un ou tous les tokens</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- API ROUTES -->
+        <section id="api">
+            <h2>Routes API</h2>
+
+            <div class="info">
+                <strong>Base URL:</strong> <code>http://localhost:8080/api</code><br>
+                <strong>Swagger UI:</strong> <code>http://localhost:8080/api/docs</code>
+            </div>
+
+            <h3>Authentification</h3>
+            <table>
+                <tr>
+                    <th>Methode</th>
+                    <th>Route</th>
+                    <th>Description</th>
+                    <th>Acces</th>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-post">POST</span></td>
+                    <td><code>/api/login</code></td>
+                    <td>Connexion (retourne JWT + cookie refresh)</td>
+                    <td><span class="badge badge-public">Public</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-post">POST</span></td>
+                    <td><code>/api/token/refresh</code></td>
+                    <td>Rafraichir le JWT</td>
+                    <td><span class="badge badge-public">Public</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-post">POST</span></td>
+                    <td><code>/api/token/revoke</code></td>
+                    <td>Revoquer le token actuel</td>
+                    <td><span class="badge badge-auth">Auth</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-post">POST</span></td>
+                    <td><code>/api/token/revoke-all</code></td>
+                    <td>Revoquer tous les tokens</td>
+                    <td><span class="badge badge-auth">Auth</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/auth/sessions</code></td>
+                    <td>Lister les sessions actives</td>
+                    <td><span class="badge badge-auth">Auth</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/auth/me</code></td>
+                    <td>Profil utilisateur connecte</td>
+                    <td><span class="badge badge-auth">Auth</span></td>
+                </tr>
+            </table>
+
+            <h3>Utilisateurs</h3>
+            <table>
+                <tr>
+                    <th>Methode</th>
+                    <th>Route</th>
+                    <th>Description</th>
+                    <th>Acces</th>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/users</code></td>
+                    <td>Liste des utilisateurs</td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-post">POST</span></td>
+                    <td><code>/api/users</code></td>
+                    <td>Creer un utilisateur</td>
+                    <td><span class="badge badge-public">Public</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/users/{id}</code></td>
+                    <td>Detail utilisateur</td>
+                    <td><span class="badge badge-auth">Self/Admin</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-patch">PATCH</span></td>
+                    <td><code>/api/users/{id}</code></td>
+                    <td>Modifier utilisateur</td>
+                    <td><span class="badge badge-auth">Self/Admin</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-delete">DELETE</span></td>
+                    <td><code>/api/users/{id}</code></td>
+                    <td>Supprimer utilisateur</td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                </tr>
+            </table>
+
+            <h3>Produits</h3>
+            <table>
+                <tr>
+                    <th>Methode</th>
+                    <th>Route</th>
+                    <th>Description</th>
+                    <th>Acces</th>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/products</code></td>
+                    <td>Liste des produits</td>
+                    <td><span class="badge badge-public">Public</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/products/{id}</code></td>
+                    <td>Detail produit</td>
+                    <td><span class="badge badge-public">Public</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/products/low-stock</code></td>
+                    <td>Produits en stock faible</td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-post">POST</span></td>
+                    <td><code>/api/products</code></td>
+                    <td>Creer produit</td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-patch">PATCH</span></td>
+                    <td><code>/api/products/{id}</code></td>
+                    <td>Modifier produit</td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-delete">DELETE</span></td>
+                    <td><code>/api/products/{id}</code></td>
+                    <td>Supprimer produit</td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                </tr>
+            </table>
+
+            <h3>Extras</h3>
+            <table>
+                <tr>
+                    <th>Methode</th>
+                    <th>Route</th>
+                    <th>Description</th>
+                    <th>Acces</th>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/extras</code></td>
+                    <td>Liste des extras</td>
+                    <td><span class="badge badge-public">Public</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/extras/low-stock</code></td>
+                    <td>Extras en stock faible</td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-post">POST</span></td>
+                    <td><code>/api/extras/{id}/restock</code></td>
+                    <td>Restocker un extra</td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                </tr>
+            </table>
+
+            <h3>Commandes</h3>
+            <table>
+                <tr>
+                    <th>Methode</th>
+                    <th>Route</th>
+                    <th>Description</th>
+                    <th>Acces</th>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/orders</code></td>
+                    <td>Liste des commandes</td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/auth/me/orders</code></td>
+                    <td>Mes commandes</td>
+                    <td><span class="badge badge-auth">Auth</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-post">POST</span></td>
+                    <td><code>/api/orders</code></td>
+                    <td>Creer commande</td>
+                    <td><span class="badge badge-auth">Auth</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/orders/{id}</code></td>
+                    <td>Detail commande</td>
+                    <td><span class="badge badge-auth">Owner/Admin</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-patch">PATCH</span></td>
+                    <td><code>/api/orders/{id}</code></td>
+                    <td>Modifier statut</td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                </tr>
+            </table>
+
+            <h3>Fidelite</h3>
+            <table>
+                <tr>
+                    <th>Methode</th>
+                    <th>Route</th>
+                    <th>Description</th>
+                    <th>Acces</th>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/loyalty/rewards</code></td>
+                    <td>Liste des recompenses</td>
+                    <td><span class="badge badge-public">Public</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-post">POST</span></td>
+                    <td><code>/api/loyalty/rewards/{id}/redeem</code></td>
+                    <td>Echanger une recompense</td>
+                    <td><span class="badge badge-auth">Auth</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/auth/me/loyalty</code></td>
+                    <td>Mon compte fidelite</td>
+                    <td><span class="badge badge-auth">Auth</span></td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-get">GET</span></td>
+                    <td><code>/api/auth/me/loyalty/transactions</code></td>
+                    <td>Historique transactions</td>
+                    <td><span class="badge badge-auth">Auth</span></td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- SERVICES -->
+        <section id="services">
+            <h2>Services Metier</h2>
+
+            <h3>OrderService</h3>
+            <p><strong>Fichier:</strong> <code>api/src/Service/Order/OrderService.php</code></p>
+            <table>
+                <tr><th>Methode</th><th>Description</th></tr>
+                <tr>
+                    <td><code>createOrder(User, CreateOrderDTO)</code></td>
+                    <td>Cree une commande avec validation du stock</td>
+                </tr>
+                <tr>
+                    <td><code>updateOrderStatus(Order, OrderStatus)</code></td>
+                    <td>Change le statut avec gestion stock/points</td>
+                </tr>
+                <tr>
+                    <td><code>calculateOrderTotal(Order)</code></td>
+                    <td>Recalcule le montant total</td>
+                </tr>
+                <tr>
+                    <td><code>generateOrderNumber()</code></td>
+                    <td>Genere un numero unique</td>
+                </tr>
+            </table>
+
+            <h3>LoyaltyService</h3>
+            <p><strong>Fichier:</strong> <code>api/src/Service/Loyalty/LoyaltyService.php</code></p>
+            <table>
+                <tr><th>Methode</th><th>Description</th></tr>
+                <tr>
+                    <td><code>awardPoints(LoyaltyAccount, Order)</code></td>
+                    <td>Attribue les points pour une commande</td>
+                </tr>
+                <tr>
+                    <td><code>redeemReward(LoyaltyAccount, LoyaltyReward)</code></td>
+                    <td>Echange des points contre une recompense</td>
+                </tr>
+                <tr>
+                    <td><code>calculatePoints(float, string)</code></td>
+                    <td>Calcule les points avec multiplicateur tier</td>
+                </tr>
+                <tr>
+                    <td><code>updateTier(LoyaltyAccount)</code></td>
+                    <td>Met a jour le tier selon les points</td>
+                </tr>
+            </table>
+
+            <h3>StockService</h3>
+            <p><strong>Fichier:</strong> <code>api/src/Service/Stock/StockService.php</code></p>
+            <table>
+                <tr><th>Methode</th><th>Description</th></tr>
+                <tr>
+                    <td><code>checkStock(Product/Extra, int)</code></td>
+                    <td>Verifie la disponibilite du stock</td>
+                </tr>
+                <tr>
+                    <td><code>deductStock(Product/Extra, int)</code></td>
+                    <td>Deduit le stock</td>
+                </tr>
+                <tr>
+                    <td><code>restoreStock(Product/Extra, int)</code></td>
+                    <td>Restaure le stock</td>
+                </tr>
+                <tr>
+                    <td><code>getLowStockProducts()</code></td>
+                    <td>Retourne les produits en stock faible</td>
+                </tr>
+            </table>
+
+            <h3>RefreshTokenService</h3>
+            <p><strong>Fichier:</strong> <code>api/src/Service/Auth/RefreshTokenService.php</code></p>
+            <table>
+                <tr><th>Methode</th><th>Description</th></tr>
+                <tr>
+                    <td><code>createRefreshToken(User, Request)</code></td>
+                    <td>Cree un token avec tracking</td>
+                </tr>
+                <tr>
+                    <td><code>refreshToken(string)</code></td>
+                    <td>Valide et renouvelle un token</td>
+                </tr>
+                <tr>
+                    <td><code>revokeToken(string)</code></td>
+                    <td>Revoque un token specifique</td>
+                </tr>
+                <tr>
+                    <td><code>revokeAllUserTokens(User)</code></td>
+                    <td>Revoque tous les tokens d'un user</td>
+                </tr>
+            </table>
+
+            <h3>State Processors (API Platform)</h3>
+            <table>
+                <tr><th>Processor</th><th>Operations</th><th>Description</th></tr>
+                <tr>
+                    <td><code>OrderStateProcessor</code></td>
+                    <td>POST, PATCH</td>
+                    <td>Creation et mise a jour des commandes</td>
+                </tr>
+                <tr>
+                    <td><code>UserStateProcessor</code></td>
+                    <td>POST, PATCH</td>
+                    <td>Creation utilisateur + compte fidelite</td>
+                </tr>
+                <tr>
+                    <td><code>ExtraStateProcessor</code></td>
+                    <td>POST (restock)</td>
+                    <td>Restockage des extras</td>
+                </tr>
+                <tr>
+                    <td><code>RedeemRewardProcessor</code></td>
+                    <td>POST</td>
+                    <td>Echange de recompenses</td>
+                </tr>
+            </table>
+
+            <h3>State Providers (API Platform)</h3>
+            <table>
+                <tr><th>Provider</th><th>Route</th><th>Description</th></tr>
+                <tr>
+                    <td><code>MyOrdersProvider</code></td>
+                    <td>/api/auth/me/orders</td>
+                    <td>Commandes de l'utilisateur connecte</td>
+                </tr>
+                <tr>
+                    <td><code>MyLoyaltyProvider</code></td>
+                    <td>/api/auth/me/loyalty</td>
+                    <td>Compte fidelite de l'utilisateur</td>
+                </tr>
+                <tr>
+                    <td><code>MeProvider</code></td>
+                    <td>/api/auth/me</td>
+                    <td>Profil de l'utilisateur connecte</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- SECURITE -->
+        <section id="securite">
+            <h2>Securite</h2>
+
+            <h3>Configuration JWT</h3>
+            <pre><code># config/packages/lexik_jwt_authentication.yaml
+lexik_jwt_authentication:
+    secret_key: '%env(resolve:JWT_SECRET_KEY)%'
+    public_key: '%env(resolve:JWT_PUBLIC_KEY)%'
+    pass_phrase: '%env(JWT_PASSPHRASE)%'
+    token_ttl: 3600  # 1 heure</code></pre>
+
+            <h3>Firewall</h3>
+            <pre><code># config/packages/security.yaml
+security:
+    firewalls:
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: /api/login
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        api:
+            pattern: ^/api
+            stateless: true
+            jwt: ~</code></pre>
+
+            <h3>Controle d'acces</h3>
+            <pre><code>access_control:
+    - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+    - { path: ^/api/login, roles: PUBLIC_ACCESS }
+    - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
+    - { path: ^/api/users, methods: [POST], roles: PUBLIC_ACCESS }
+    - { path: ^/api/products, methods: [GET], roles: PUBLIC_ACCESS }
+    - { path: ^/api/extras, methods: [GET], roles: PUBLIC_ACCESS }
+    - { path: ^/api/loyalty/rewards, methods: [GET], roles: PUBLIC_ACCESS }
+    - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }</code></pre>
+
+            <h3>Roles</h3>
+            <table>
+                <tr><th>Role</th><th>Description</th><th>Permissions</th></tr>
+                <tr>
+                    <td><code>ROLE_USER</code></td>
+                    <td>Utilisateur standard</td>
+                    <td>Creer commandes, voir son profil, gerer sa fidelite</td>
+                </tr>
+                <tr>
+                    <td><code>ROLE_ADMIN</code></td>
+                    <td>Administrateur</td>
+                    <td>Toutes les operations, gestion produits/commandes/users</td>
+                </tr>
+            </table>
+
+            <h3>Refresh Token (Cookie)</h3>
+            <div class="highlight">
+                <p><strong>Configuration du cookie:</strong></p>
+                <ul>
+                    <li><strong>HttpOnly:</strong> true (non accessible via JavaScript)</li>
+                    <li><strong>Secure:</strong> true en production (HTTPS uniquement)</li>
+                    <li><strong>SameSite:</strong> Lax</li>
+                    <li><strong>Duree:</strong> 30 jours</li>
+                    <li><strong>Path:</strong> /api/token</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- TESTS -->
+        <section id="tests">
+            <h2>Tests</h2>
+
+            <h3>Structure</h3>
+            <pre><code>tests/
+├── Unit/
+│   ├── Entity/           # Tests des entites
+│   │   ├── UserTest.php
+│   │   ├── OrderTest.php
+│   │   └── ...
+│   └── Service/          # Tests des services
+│       ├── OrderServiceTest.php
+│       ├── LoyaltyServiceTest.php
+│       └── ...
+└── Functional/
+    ├── Api/              # Tests d'endpoints
+    │   ├── UserApiTest.php
+    │   ├── ProductApiTest.php
+    │   ├── OrderApiTest.php
+    │   └── ...
+    └── ApiTestCase.php   # Classe de base</code></pre>
+
+            <h3>Commandes</h3>
+            <pre><code># Tous les tests
+make test
+
+# Tests unitaires uniquement
+make test:unit
+
+# Tests fonctionnels uniquement
+make test:functional
+
+# Avec couverture
+./vendor/bin/phpunit --coverage-html coverage/</code></pre>
+
+            <h3>Exemple de test fonctionnel</h3>
+            <pre><code>class OrderApiTest extends ApiTestCase
+{
+    public function testCreateOrder(): void
+    {
+        $client = static::createClient();
+        $this->loginAs($client, 'john.doe@example.com');
+
+        $response = $client->request('POST', '/api/orders', [
+            'json' => [
+                'items' => [
+                    ['productId' => 1, 'quantity' => 2]
+                ],
+                'tableNumber' => 'A1'
+            ]
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertJsonContains(['status' => 'pending']);
+    }
+}</code></pre>
+
+            <h3>Qualite du code</h3>
+            <pre><code># Analyse statique (PHPStan niveau 8)
+make phpstan
+
+# Verification style de code
+make cs:check
+
+# Correction automatique du style
+make cs:fix
+
+# Tous les checks
+make qa</code></pre>
+        </section>
+
+        <!-- COMMANDES -->
+        <section id="commandes">
+            <h2>Commandes Makefile</h2>
+
+            <h3>Docker</h3>
+            <table>
+                <tr><th>Commande</th><th>Description</th></tr>
+                <tr><td><code>make build</code></td><td>Build les images Docker</td></tr>
+                <tr><td><code>make up</code></td><td>Demarre les containers</td></tr>
+                <tr><td><code>make down</code></td><td>Arrete les containers</td></tr>
+                <tr><td><code>make restart</code></td><td>Redemarre les containers</td></tr>
+                <tr><td><code>make logs</code></td><td>Affiche les logs</td></tr>
+                <tr><td><code>make shell</code></td><td>Ouvre un shell dans le container PHP</td></tr>
+            </table>
+
+            <h3>Base de donnees</h3>
+            <table>
+                <tr><th>Commande</th><th>Description</th></tr>
+                <tr><td><code>make db-create</code></td><td>Cree la base de donnees</td></tr>
+                <tr><td><code>make db-migrate</code></td><td>Execute les migrations</td></tr>
+                <tr><td><code>make db-diff</code></td><td>Genere une nouvelle migration</td></tr>
+                <tr><td><code>make db-seed</code></td><td>Charge les fixtures</td></tr>
+            </table>
+
+            <h3>Developpement</h3>
+            <table>
+                <tr><th>Commande</th><th>Description</th></tr>
+                <tr><td><code>make init</code></td><td>Initialisation complete du projet</td></tr>
+                <tr><td><code>make composer-install</code></td><td>Installe les dependances</td></tr>
+                <tr><td><code>make jwt-generate</code></td><td>Genere les cles JWT</td></tr>
+                <tr><td><code>make cache-clear</code></td><td>Vide le cache Symfony</td></tr>
+            </table>
+
+            <h3>Tests et Qualite</h3>
+            <table>
+                <tr><th>Commande</th><th>Description</th></tr>
+                <tr><td><code>make test</code></td><td>Lance tous les tests</td></tr>
+                <tr><td><code>make test:unit</code></td><td>Tests unitaires</td></tr>
+                <tr><td><code>make test:functional</code></td><td>Tests fonctionnels</td></tr>
+                <tr><td><code>make phpstan</code></td><td>Analyse statique</td></tr>
+                <tr><td><code>make cs:check</code></td><td>Verifie le style de code</td></tr>
+                <tr><td><code>make cs:fix</code></td><td>Corrige le style de code</td></tr>
+                <tr><td><code>make qa</code></td><td>Tous les checks qualite</td></tr>
+            </table>
+        </section>
+
+        <!-- DONNEES DE TEST -->
+        <section id="fixtures">
+            <h2>Donnees de Test (Fixtures)</h2>
+
+            <h3>Utilisateurs</h3>
+            <table>
+                <tr><th>Email</th><th>Mot de passe</th><th>Role</th></tr>
+                <tr><td>admin@smartcafe.fr</td><td>admin123</td><td>ROLE_ADMIN</td></tr>
+                <tr><td>john.doe@example.com</td><td>password123</td><td>ROLE_USER</td></tr>
+                <tr><td>jane.doe@example.com</td><td>password123</td><td>ROLE_USER</td></tr>
+            </table>
+
+            <h3>Extras disponibles</h3>
+            <ul>
+                <li>Chantilly</li>
+                <li>Sirop Caramel</li>
+                <li>Sirop Vanille</li>
+                <li>Sirop Noisette</li>
+                <li>Lait d'Avoine</li>
+                <li>Lait d'Amande</li>
+                <li>Lait de Soja</li>
+                <li>Shot Espresso</li>
+                <li>Copeaux Chocolat</li>
+                <li>Cannelle</li>
+            </ul>
+
+            <h3>Charger les fixtures</h3>
+            <pre><code>make db-seed</code></pre>
+        </section>
+    </div>
+
+    <footer>
+        <p>SmartCafe - Documentation Technique v1.0.0</p>
+        <p>Generee le 21 janvier 2026</p>
+    </footer>
+</body>
+</html>
