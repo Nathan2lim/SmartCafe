@@ -13,8 +13,11 @@ use Symfony\Component\HttpFoundation\Cookie;
 
 class JwtCreatedSubscriber implements EventSubscriberInterface
 {
-    private const COOKIE_NAME = 'refresh_token';
-    private const COOKIE_PATH = '/api/token';
+    private const REFRESH_TOKEN_COOKIE = 'refresh_token';
+    private const REFRESH_TOKEN_PATH = '/api/token';
+    private const JWT_COOKIE = 'jwt_token';
+    private const JWT_PATH = '/api';
+    private const JWT_TTL = 3600;
 
     public function __construct(
         private readonly RefreshTokenService $refreshTokenService,
@@ -37,24 +40,44 @@ class JwtCreatedSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $refreshToken = $this->refreshTokenService->createRefreshToken($user);
+        $response = $event->getResponse();
+        $data = $event->getData();
+        $isSecure = $this->appEnv === 'prod';
 
-        $cookie = new Cookie(
-            self::COOKIE_NAME,
+        // JWT cookie
+        $jwtToken = $data['token'] ?? null;
+        if ($jwtToken) {
+            $jwtCookie = new Cookie(
+                self::JWT_COOKIE,
+                $jwtToken,
+                time() + self::JWT_TTL,
+                self::JWT_PATH,
+                null,
+                $isSecure,
+                true,
+                false,
+                Cookie::SAMESITE_STRICT
+            );
+            $response->headers->setCookie($jwtCookie);
+        }
+
+        // Refresh token cookie
+        $refreshToken = $this->refreshTokenService->createRefreshToken($user);
+        $refreshCookie = new Cookie(
+            self::REFRESH_TOKEN_COOKIE,
             $refreshToken->getToken(),
             $refreshToken->getExpiresAt(),
-            self::COOKIE_PATH,
+            self::REFRESH_TOKEN_PATH,
             null,
-            $this->appEnv === 'prod',
+            $isSecure,
             true,
             false,
             Cookie::SAMESITE_STRICT
         );
+        $response->headers->setCookie($refreshCookie);
 
-        $response = $event->getResponse();
-        $response->headers->setCookie($cookie);
-
-        $data = $event->getData();
+        // Remove tokens from response body, keep only expiration info
+        unset($data['token']);
         $data['refresh_token_expires_at'] = $refreshToken->getExpiresAt()->format('c');
         $event->setData($data);
     }
