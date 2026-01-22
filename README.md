@@ -1,10 +1,18 @@
 # SmartCafe API
 
-API REST de gestion de café avec système de commandes, gestion de stocks et programme de fidélité.
+API REST pour application mobile de coffee shop - Gestion des commandes, produits, extras et programme de fidélité.
 
 ## Version
 
 **v1.0.0**
+
+## Environnements
+
+| Environnement | URL |
+|---------------|-----|
+| Production | http://152.228.131.67/api |
+| Local | http://localhost:8080/api |
+| Swagger UI (local) | http://localhost:8080/api/docs |
 
 ## Technologies
 
@@ -12,11 +20,25 @@ API REST de gestion de café avec système de commandes, gestion de stocks et pr
 |-----------|-------------|
 | Framework | Symfony 8.0 |
 | PHP | >= 8.2 (Docker: 8.4-FPM) |
-| Base de données | PostgreSQL 15 |
+| Base de données | PostgreSQL 16 |
 | API | API Platform 4.2 |
 | Authentification | JWT (Lexik) + Refresh Token |
 | Conteneurisation | Docker & Docker Compose |
 | Serveur Web | Nginx |
+| CI/CD | GitHub Actions |
+
+## CI/CD
+
+Le projet utilise GitHub Actions pour l'intégration et le déploiement continus :
+
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| CI | Push/PR sur main, develop | Tests, PHPStan, PHP-CS-Fixer, Security |
+| CD | Push sur main | Build Docker + Déploiement production |
+
+### Statut
+- **CI** : Tests unitaires, fonctionnels, analyse statique, code style
+- **CD** : Déploiement automatique sur le serveur de production
 
 ## Lancement du projet
 
@@ -49,13 +71,13 @@ make test         # Lancer les tests
 make qa           # Qualité (tests + phpstan + cs)
 ```
 
-## Accès
+## Documentation
 
-| Ressource | URL |
-|-----------|-----|
-| API | http://localhost:8080/api |
-| Swagger UI | http://localhost:8080/api/docs |
-| Documentation technique | [docs/technical.html](docs/technical.html) |
+| Document | Chemin |
+|----------|--------|
+| Documentation technique HTML | [docs/technical.html](docs/technical.html) |
+| Documentation technique PDF | [docs/technical.pdf](docs/technical.pdf) |
+| Collection Postman | [SmartCafe.postman_collection.json](SmartCafe.postman_collection.json) |
 
 ## Comptes de test
 
@@ -70,16 +92,43 @@ make qa           # Qualité (tests + phpstan + cs)
 SmartCafe/
 ├── api/                 # Backend Symfony
 │   ├── src/
-│   │   ├── Controller/  # Controllers
-│   │   ├── Entity/      # Entités Doctrine
+│   │   ├── Controller/  # Controllers (AuthController)
+│   │   ├── Entity/      # Entités Doctrine (11 entités)
 │   │   ├── Service/     # Services métier
 │   │   ├── State/       # Processors API Platform
 │   │   └── ...
+│   ├── tests/           # Tests PHPUnit
 │   └── config/          # Configuration
 ├── docker/              # Config Docker
 ├── docs/                # Documentation
-│   └── technical.html   # Doc technique complète
+│   ├── technical.html   # Doc technique HTML
+│   └── technical.pdf    # Doc technique PDF
+├── .github/workflows/   # CI/CD GitHub Actions
 ├── docker-compose.yml
 ├── Makefile
 └── README.md
 ```
+
+## API Endpoints principaux
+
+### Authentification
+- `POST /api/login` - Connexion (JWT + cookie refresh)
+- `POST /api/token/refresh` - Rafraîchir le token
+- `GET /api/auth/me` - Profil utilisateur
+
+### Produits & Extras
+- `GET /api/products` - Liste des produits
+- `GET /api/extras` - Liste des extras
+
+### Commandes
+- `POST /api/orders` - Créer une commande
+- `GET /api/auth/me/orders` - Mes commandes
+
+### Fidélité
+- `GET /api/loyalty/rewards` - Récompenses disponibles
+- `POST /api/loyalty/rewards/{id}/redeem` - Échanger une récompense
+- `GET /api/auth/me/loyalty` - Mon compte fidélité
+
+## Licence
+
+Projet académique - M2 2025-2026
