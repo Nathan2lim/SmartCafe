@@ -46,7 +46,7 @@ class RefreshTokenService
     /**
      * Refresh the JWT token using a valid refresh token.
      *
-     * @return array{token: string, refresh_token: string, refresh_token_expires_at: string}
+    * @return array{token: string, refresh_token: string, refresh_token_expires_at: string}
      *
      * @throws InvalidArgumentException if refresh token is invalid
      */
