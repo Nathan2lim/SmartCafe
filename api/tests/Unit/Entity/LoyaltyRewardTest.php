@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Entity;
 use App\Entity\LoyaltyReward;
 use App\Entity\Product;
 use App\Enum\RewardType;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class LoyaltyRewardTest extends TestCase
@@ -126,7 +127,7 @@ class LoyaltyRewardTest extends TestCase
     public function testSetUpdatedAt(): void
     {
         $reward = new LoyaltyReward();
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         $reward->setUpdatedAt($now);
 

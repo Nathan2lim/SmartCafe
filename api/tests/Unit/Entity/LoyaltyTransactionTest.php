@@ -9,6 +9,7 @@ use App\Entity\LoyaltyReward;
 use App\Entity\LoyaltyTransaction;
 use App\Entity\Order;
 use App\Enum\LoyaltyTransactionType;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class LoyaltyTransactionTest extends TestCase
@@ -176,7 +177,7 @@ class LoyaltyTransactionTest extends TestCase
     public function testSetCreatedAt(): void
     {
         $transaction = new LoyaltyTransaction();
-        $date = new \DateTimeImmutable('2024-01-01');
+        $date = new DateTimeImmutable('2024-01-01');
 
         $transaction->setCreatedAt($date);
 

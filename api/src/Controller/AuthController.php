@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Service\Auth\RefreshTokenService;
+use DateTimeImmutable;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -47,17 +48,17 @@ class AuthController extends AbstractController
             ]);
 
             // Refresh token cookie
-            $expiresAt = new \DateTimeImmutable($tokens['refresh_token_expires_at']);
+            $expiresAt = new DateTimeImmutable($tokens['refresh_token_expires_at']);
             $refreshCookie = new Cookie(
                 self::REFRESH_TOKEN_COOKIE,
                 $tokens['refresh_token'],
                 $expiresAt,
                 self::REFRESH_TOKEN_PATH,
                 null,
-                $this->appEnv === 'prod',
+                'prod' === $this->appEnv,
                 true,
                 false,
-                Cookie::SAMESITE_STRICT
+                Cookie::SAMESITE_STRICT,
             );
             $response->headers->setCookie($refreshCookie);
 

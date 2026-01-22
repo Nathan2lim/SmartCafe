@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Entity;
 
 use App\Entity\Product;
 use App\Entity\ProductExtra;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class ProductTest extends TestCase
@@ -153,7 +154,7 @@ class ProductTest extends TestCase
     public function testSetUpdatedAt(): void
     {
         $product = new Product();
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         $product->setUpdatedAt($now);
 

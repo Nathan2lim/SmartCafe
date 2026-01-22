@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Entity;
 
 use App\Entity\RefreshToken;
 use App\Entity\User;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class RefreshTokenTest extends TestCase
@@ -21,7 +22,7 @@ class RefreshTokenTest extends TestCase
         $this->assertSame($user, $refreshToken->getUser());
         $this->assertNotEmpty($refreshToken->getToken());
         // Token length can vary, just ensure it's not empty
-        $this->assertGreaterThan(0, strlen($refreshToken->getToken()));
+        $this->assertGreaterThan(0, \strlen($refreshToken->getToken()));
         $this->assertFalse($refreshToken->isRevoked());
         $this->assertNotNull($refreshToken->getCreatedAt());
         $this->assertNotNull($refreshToken->getExpiresAt());
@@ -34,7 +35,7 @@ class RefreshTokenTest extends TestCase
 
         $refreshToken = RefreshToken::create($user, $ttl);
 
-        $expectedExpiration = (new \DateTimeImmutable())->modify('+3600 seconds');
+        $expectedExpiration = (new DateTimeImmutable())->modify('+3600 seconds');
         $actualExpiration = $refreshToken->getExpiresAt();
 
         // Allow 2 seconds difference for test execution time

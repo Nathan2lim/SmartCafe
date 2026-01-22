@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Extra;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class ExtraTest extends TestCase
@@ -115,7 +116,7 @@ class ExtraTest extends TestCase
     public function testSetUpdatedAt(): void
     {
         $extra = new Extra();
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         $extra->setUpdatedAt($now);
 
@@ -125,7 +126,7 @@ class ExtraTest extends TestCase
     public function testSetCreatedAt(): void
     {
         $extra = new Extra();
-        $now = new \DateTimeImmutable('2024-01-01');
+        $now = new DateTimeImmutable('2024-01-01');
 
         $extra->setCreatedAt($now);
 

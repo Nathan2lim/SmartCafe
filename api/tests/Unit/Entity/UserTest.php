@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Entity;
 
 use App\Entity\LoyaltyAccount;
 use App\Entity\User;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class UserTest extends TestCase
@@ -131,7 +132,7 @@ class UserTest extends TestCase
     public function testSetUpdatedAt(): void
     {
         $user = new User();
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         $user->setUpdatedAt($now);
 
@@ -141,7 +142,7 @@ class UserTest extends TestCase
     public function testSetCreatedAt(): void
     {
         $user = new User();
-        $now = new \DateTimeImmutable('2024-01-01');
+        $now = new DateTimeImmutable('2024-01-01');
 
         $user->setCreatedAt($now);
 

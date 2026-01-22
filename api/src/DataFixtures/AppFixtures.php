@@ -16,6 +16,7 @@ use App\Entity\User;
 use App\Enum\LoyaltyTransactionType;
 use App\Enum\OrderStatus;
 use App\Enum\RewardType;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -92,14 +93,14 @@ class AppFixtures extends Fixture
         $users[] = $testUser;
 
         // Random users
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $user = new User();
             $user->setEmail($this->faker->unique()->safeEmail());
             $user->setPassword($this->passwordHasher->hashPassword($user, 'password123'));
             $user->setFirstName($this->faker->firstName());
             $user->setLastName($this->faker->lastName());
             $user->setPhone($this->faker->optional(0.7)->phoneNumber());
-            $user->setCreatedAt(\DateTimeImmutable::createFromMutable($this->faker->dateTimeBetween('-1 year', 'now')));
+            $user->setCreatedAt(DateTimeImmutable::createFromMutable($this->faker->dateTimeBetween('-1 year', 'now')));
 
             $manager->persist($user);
             $users[] = $user;
@@ -418,13 +419,13 @@ class AppFixtures extends Fixture
                 $product->setCategory($category);
                 $product->setStockQuantity($this->faker->numberBetween(10, 300));
                 $product->setLowStockThreshold($this->faker->numberBetween(5, 20));
-                $product->setAlaCarte(in_array($category, ['Viennoiseries', 'Pâtisseries', 'Sandwichs', 'Wraps & Bagels', 'Salades', 'Petit-déjeuner']));
+                $product->setAlaCarte(\in_array($category, ['Viennoiseries', 'Pâtisseries', 'Sandwichs', 'Wraps & Bagels', 'Salades', 'Petit-déjeuner']));
                 $product->setAvailable($this->faker->boolean(95));
                 $product->setImageUrl($this->faker->optional(0.3)->imageUrl(640, 480, 'food'));
 
                 $manager->persist($product);
                 $products[$index] = $product;
-                $index++;
+                ++$index;
             }
         }
 
@@ -433,7 +434,7 @@ class AppFixtures extends Fixture
 
     /**
      * @param array<int, Product> $products
-     * @param array<int, Extra>   $extras
+     * @param array<int, Extra> $extras
      */
     private function createProductExtras(ObjectManager $manager, array $products, array $extras): void
     {
@@ -441,17 +442,18 @@ class AppFixtures extends Fixture
             $category = $product->getCategory();
 
             // Boissons chaudes: sirops, laits, toppings café
-            if ($category === 'Boissons chaudes') {
-                $eligibleExtras = array_filter($extras, fn($e) =>
-                    str_contains($e->getName(), 'Sirop') ||
-                    str_contains($e->getName(), 'Lait') ||
-                    str_contains($e->getName(), 'Shot') ||
-                    str_contains($e->getName(), 'Crème') ||
-                    str_contains($e->getName(), 'Copeaux') ||
-                    str_contains($e->getName(), 'Cannelle') ||
-                    str_contains($e->getName(), 'Cacao') ||
-                    str_contains($e->getName(), 'Mousse') ||
-                    str_contains($e->getName(), 'Marshmallow')
+            if ('Boissons chaudes' === $category) {
+                $eligibleExtras = array_filter(
+                    $extras,
+                    fn ($e) => str_contains($e->getName(), 'Sirop')
+                    || str_contains($e->getName(), 'Lait')
+                    || str_contains($e->getName(), 'Shot')
+                    || str_contains($e->getName(), 'Crème')
+                    || str_contains($e->getName(), 'Copeaux')
+                    || str_contains($e->getName(), 'Cannelle')
+                    || str_contains($e->getName(), 'Cacao')
+                    || str_contains($e->getName(), 'Mousse')
+                    || str_contains($e->getName(), 'Marshmallow'),
                 );
 
                 foreach ($this->faker->randomElements($eligibleExtras, $this->faker->numberBetween(5, 15)) as $extra) {
@@ -460,12 +462,13 @@ class AppFixtures extends Fixture
             }
 
             // Boissons froides: sirops, laits, toppings
-            if ($category === 'Boissons froides') {
-                $eligibleExtras = array_filter($extras, fn($e) =>
-                    str_contains($e->getName(), 'Sirop') ||
-                    str_contains($e->getName(), 'Lait') ||
-                    str_contains($e->getName(), 'Shot') ||
-                    str_contains($e->getName(), 'Crème')
+            if ('Boissons froides' === $category) {
+                $eligibleExtras = array_filter(
+                    $extras,
+                    fn ($e) => str_contains($e->getName(), 'Sirop')
+                    || str_contains($e->getName(), 'Lait')
+                    || str_contains($e->getName(), 'Shot')
+                    || str_contains($e->getName(), 'Crème'),
                 );
 
                 foreach ($this->faker->randomElements($eligibleExtras, $this->faker->numberBetween(3, 10)) as $extra) {
@@ -474,12 +477,13 @@ class AppFixtures extends Fixture
             }
 
             // Viennoiseries: beurre, confitures
-            if ($category === 'Viennoiseries') {
-                $eligibleExtras = array_filter($extras, fn($e) =>
-                    str_contains($e->getName(), 'Beurre') ||
-                    str_contains($e->getName(), 'Confiture') ||
-                    str_contains($e->getName(), 'Miel') ||
-                    str_contains($e->getName(), 'Pâte à tartiner')
+            if ('Viennoiseries' === $category) {
+                $eligibleExtras = array_filter(
+                    $extras,
+                    fn ($e) => str_contains($e->getName(), 'Beurre')
+                    || str_contains($e->getName(), 'Confiture')
+                    || str_contains($e->getName(), 'Miel')
+                    || str_contains($e->getName(), 'Pâte à tartiner'),
                 );
 
                 foreach ($eligibleExtras as $extra) {
@@ -490,14 +494,15 @@ class AppFixtures extends Fixture
             }
 
             // Sandwichs, Wraps: suppléments salés
-            if (in_array($category, ['Sandwichs', 'Wraps & Bagels', 'Salades', 'Petit-déjeuner'])) {
-                $eligibleExtras = array_filter($extras, fn($e) =>
-                    str_contains($e->getName(), 'Avocat') ||
-                    str_contains($e->getName(), 'Saumon') ||
-                    str_contains($e->getName(), 'Bacon') ||
-                    str_contains($e->getName(), 'Œuf') ||
-                    str_contains($e->getName(), 'Fromage') ||
-                    str_contains($e->getName(), 'Cream cheese')
+            if (\in_array($category, ['Sandwichs', 'Wraps & Bagels', 'Salades', 'Petit-déjeuner'])) {
+                $eligibleExtras = array_filter(
+                    $extras,
+                    fn ($e) => str_contains($e->getName(), 'Avocat')
+                    || str_contains($e->getName(), 'Saumon')
+                    || str_contains($e->getName(), 'Bacon')
+                    || str_contains($e->getName(), 'Œuf')
+                    || str_contains($e->getName(), 'Fromage')
+                    || str_contains($e->getName(), 'Cream cheese'),
                 );
 
                 foreach ($eligibleExtras as $extra) {
@@ -564,12 +569,13 @@ class AppFixtures extends Fixture
             ['Menu complet offert (Gold)', 'Sandwich + boisson + dessert', 300, RewardType::FREE_PRODUCT, null, null, 'gold'],
         ];
 
-        $coffeeProducts = array_filter($products, fn($p) =>
-            str_contains(strtolower($p->getName()), 'espresso') ||
-            str_contains(strtolower($p->getName()), 'latte') ||
-            str_contains(strtolower($p->getName()), 'cappuccino') ||
-            str_contains(strtolower($p->getName()), 'croissant') ||
-            str_contains(strtolower($p->getName()), 'cookie')
+        $coffeeProducts = array_filter(
+            $products,
+            fn ($p) => str_contains(strtolower($p->getName()), 'espresso')
+            || str_contains(strtolower($p->getName()), 'latte')
+            || str_contains(strtolower($p->getName()), 'cappuccino')
+            || str_contains(strtolower($p->getName()), 'croissant')
+            || str_contains(strtolower($p->getName()), 'cookie'),
         );
         $coffeeProducts = array_values($coffeeProducts);
 
@@ -580,17 +586,17 @@ class AppFixtures extends Fixture
             $reward->setPointsCost($data[2]);
             $reward->setType($data[3]);
 
-            if (isset($data[4]) && $data[4] !== null) {
+            if (isset($data[4]) && null !== $data[4]) {
                 $reward->setDiscountValue($data[4]);
             }
-            if (isset($data[5]) && $data[5] !== null) {
+            if (isset($data[5]) && null !== $data[5]) {
                 $reward->setDiscountPercent($data[5]);
             }
-            if (isset($data[6]) && $data[6] !== null) {
+            if (isset($data[6]) && null !== $data[6]) {
                 $reward->setRequiredTier($data[6]);
             }
 
-            if ($data[3] === RewardType::FREE_PRODUCT && !empty($coffeeProducts)) {
+            if (RewardType::FREE_PRODUCT === $data[3] && !empty($coffeeProducts)) {
                 $reward->setFreeProduct($this->faker->randomElement($coffeeProducts));
             }
 
@@ -637,9 +643,9 @@ class AppFixtures extends Fixture
     }
 
     /**
-     * @param array<User>    $users
+     * @param array<User> $users
      * @param array<Product> $products
-     * @param array<Extra>   $extras
+     * @param array<Extra> $extras
      */
     private function createOrders(ObjectManager $manager, array $users, array $products, array $extras): void
     {
@@ -654,11 +660,11 @@ class AppFixtures extends Fixture
             OrderStatus::CANCELLED,
         ];
 
-        for ($i = 0; $i < 200; $i++) {
+        for ($i = 0; $i < 200; ++$i) {
             $order = new Order();
             $order->setCustomer($this->faker->randomElement($users));
             $order->setStatus($this->faker->randomElement($statuses));
-            $order->setCreatedAt(\DateTimeImmutable::createFromMutable($this->faker->dateTimeBetween('-6 months', 'now')));
+            $order->setCreatedAt(DateTimeImmutable::createFromMutable($this->faker->dateTimeBetween('-6 months', 'now')));
             $order->setNotes($this->faker->optional(0.2)->sentence());
             $order->setTableNumber($this->faker->optional(0.3)->numberBetween(1, 20) ? 'Table ' . $this->faker->numberBetween(1, 20) : null);
 
@@ -666,7 +672,7 @@ class AppFixtures extends Fixture
             $itemCount = $this->faker->numberBetween(1, 5);
             $total = 0.0;
 
-            for ($j = 0; $j < $itemCount; $j++) {
+            for ($j = 0; $j < $itemCount; ++$j) {
                 $product = $this->faker->randomElement($products);
                 $quantity = $this->faker->numberBetween(1, 3);
 
@@ -703,7 +709,7 @@ class AppFixtures extends Fixture
         foreach ($accounts as $account) {
             $transactionCount = $this->faker->numberBetween(0, 20);
 
-            for ($i = 0; $i < $transactionCount; $i++) {
+            for ($i = 0; $i < $transactionCount; ++$i) {
                 $type = $this->faker->randomElement($types);
 
                 $transaction = new LoyaltyTransaction();
@@ -711,7 +717,7 @@ class AppFixtures extends Fixture
                 $transaction->setType($type);
                 $transaction->setPoints($this->faker->numberBetween(5, 100));
                 $transaction->setDescription($this->getTransactionDescription($type));
-                $transaction->setCreatedAt(\DateTimeImmutable::createFromMutable($this->faker->dateTimeBetween('-6 months', 'now')));
+                $transaction->setCreatedAt(DateTimeImmutable::createFromMutable($this->faker->dateTimeBetween('-6 months', 'now')));
 
                 $manager->persist($transaction);
             }

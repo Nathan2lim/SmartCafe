@@ -13,6 +13,7 @@ use App\Repository\UserRepository;
 use App\Service\User\UserService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserServiceTest extends TestCase
@@ -311,7 +312,7 @@ class UserServiceTest extends TestCase
     private function createUser(int $id, string $email, string $firstName, string $lastName): User
     {
         $user = new User();
-        $reflection = new \ReflectionClass($user);
+        $reflection = new ReflectionClass($user);
         $idProperty = $reflection->getProperty('id');
         $idProperty->setValue($user, $id);
 

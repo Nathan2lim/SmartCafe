@@ -48,10 +48,10 @@ class JwtCreatedSubscriber implements EventSubscriberInterface
             $refreshToken->getExpiresAt(),
             self::REFRESH_TOKEN_PATH,
             null,
-            $this->appEnv === 'prod',
+            'prod' === $this->appEnv,
             true,
             false,
-            Cookie::SAMESITE_STRICT
+            Cookie::SAMESITE_STRICT,
         );
         $response->headers->setCookie($refreshCookie);
 

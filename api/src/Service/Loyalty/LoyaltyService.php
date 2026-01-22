@@ -18,6 +18,7 @@ use App\Repository\LoyaltyAccountRepository;
 use App\Repository\LoyaltyRewardRepository;
 use App\Repository\LoyaltyTransactionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 
 final class LoyaltyService
 {
@@ -204,7 +205,7 @@ final class LoyaltyService
         $upgradeCost = $account->getUpgradeCost();
 
         if (null === $upgradeCost) {
-            throw new \LogicException('Vous avez déjà atteint le niveau maximum');
+            throw new LogicException('Vous avez déjà atteint le niveau maximum');
         }
 
         if ($account->getPoints() < $upgradeCost) {

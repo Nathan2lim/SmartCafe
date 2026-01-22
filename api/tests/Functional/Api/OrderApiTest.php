@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Api;
 use App\Entity\Extra;
 use App\Entity\Product;
 use App\Entity\ProductExtra;
-use App\Enum\OrderStatus;
 use App\Tests\Functional\ApiTestCase;
 
 class OrderApiTest extends ApiTestCase
@@ -229,7 +228,7 @@ class OrderApiTest extends ApiTestCase
         // Check for either JSON-LD (hydra:member) or JSON array format
         $members = $data['hydra:member'] ?? $data['member'] ?? $data;
         $this->assertIsArray($members);
-        $this->assertGreaterThanOrEqual(1, count($members));
+        $this->assertGreaterThanOrEqual(1, \count($members));
     }
 
     public function testGetAllOrdersAsUserForbidden(): void

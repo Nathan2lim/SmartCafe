@@ -8,7 +8,7 @@ on:
 
 env:
   PHP_VERSION: '8.4'
-  POSTGRES_DB: smartcafe_test
+  POSTGRES_DB: smartcafe
   POSTGRES_USER: smartcafe
   POSTGRES_PASSWORD: smartcafe
 
@@ -84,7 +84,7 @@ jobs:
           DATABASE_URL: postgresql://localhost/fake
 
       - name: Run PHPStan
-        run: vendor/bin/phpstan analyse --memory-limit=512M --ansi
+        run: vendor/bin/phpstan analyse -c phpstan.dist.neon --memory-limit=512M --ansi
         working-directory: api
 
   unit-tests:
@@ -118,7 +118,7 @@ jobs:
         working-directory: api
 
       - name: Run Unit Tests
-        run: php bin/phpunit --testsuite=Unit --coverage-clover=coverage.xml
+        run: vendor/bin/phpunit --testsuite=Unit --coverage-clover=coverage.xml
         working-directory: api
         env:
           XDEBUG_MODE: coverage
@@ -184,6 +184,13 @@ jobs:
           openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout -passin pass:smartcafe
         working-directory: api
 
+      - name: Create test database
+        run: php bin/console doctrine:database:create --env=test --if-not-exists
+        working-directory: api
+        env:
+          DATABASE_URL: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}?serverVersion=16&charset=utf8
+          JWT_PASSPHRASE: smartcafe
+
       - name: Run migrations
         run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
         working-directory: api
@@ -192,7 +199,7 @@ jobs:
           JWT_PASSPHRASE: smartcafe
 
       - name: Run Functional Tests
-        run: php bin/phpunit --testsuite=Functional --coverage-clover=coverage-functional.xml
+        run: vendor/bin/phpunit --testsuite=Functional --coverage-clover=coverage-functional.xml
         working-directory: api
         env:
           DATABASE_URL: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}?serverVersion=16&charset=utf8

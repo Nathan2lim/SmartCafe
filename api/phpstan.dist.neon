@@ -1,0 +1,19 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    excludePaths:
+        - src/Kernel.php
+        - src/DataFixtures
+
+    ignoreErrors:
+        - '#Property .+ is never read, only written\.#'
+        - '#Method .+ has parameter \$\w+ with no type specified\.#'
+        - '#Unsafe usage of new static#'
+        - '#Cannot call method .+ on mixed#'
+        - '#Property .+::\$id .+ is never assigned int so it can be removed from the property type\.#'
+        - '#Property .+::\$\w+ .+ is never assigned null so it can be removed from the property type\.#'
+        - '#expects App\\Entity\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface#'
+
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false

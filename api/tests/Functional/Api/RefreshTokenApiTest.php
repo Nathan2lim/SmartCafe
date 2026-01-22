@@ -73,7 +73,7 @@ class RefreshTokenApiTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertIsArray($data);
-        $this->assertGreaterThanOrEqual(1, count($data));
+        $this->assertGreaterThanOrEqual(1, \count($data));
     }
 
     public function testGetActiveSessionsUnauthenticated(): void

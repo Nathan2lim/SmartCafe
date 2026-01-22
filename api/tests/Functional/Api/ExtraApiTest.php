@@ -29,7 +29,7 @@ class ExtraApiTest extends ApiTestCase
         // Check for either JSON-LD (hydra:member) or JSON array format
         $members = $data['hydra:member'] ?? $data['member'] ?? $data;
         $this->assertIsArray($members);
-        $this->assertGreaterThanOrEqual(1, count($members));
+        $this->assertGreaterThanOrEqual(1, \count($members));
     }
 
     public function testGetExtraByIdPublic(): void

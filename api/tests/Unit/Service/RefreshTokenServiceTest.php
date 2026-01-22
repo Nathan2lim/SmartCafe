@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -240,7 +241,7 @@ class RefreshTokenServiceTest extends TestCase
     private function createRefreshToken(User $user, string $token): RefreshToken
     {
         $refreshToken = RefreshToken::create($user, 2592000);
-        $reflection = new \ReflectionClass($refreshToken);
+        $reflection = new ReflectionClass($refreshToken);
         $tokenProperty = $reflection->getProperty('token');
         $tokenProperty->setValue($refreshToken, $token);
 

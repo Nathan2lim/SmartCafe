@@ -195,7 +195,7 @@ class UserApiTest extends ApiTestCase
         // Check for either JSON-LD (hydra:member) or JSON array format
         $members = $data['hydra:member'] ?? $data['member'] ?? $data;
         $this->assertIsArray($members);
-        $this->assertGreaterThanOrEqual(3, count($members));
+        $this->assertGreaterThanOrEqual(3, \count($members));
     }
 
     public function testGetAllUsersAsUserForbidden(): void

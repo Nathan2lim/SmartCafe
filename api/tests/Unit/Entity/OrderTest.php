@@ -9,6 +9,7 @@ use App\Entity\OrderItem;
 use App\Entity\Product;
 use App\Entity\User;
 use App\Enum\OrderStatus;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class OrderTest extends TestCase
@@ -156,7 +157,7 @@ class OrderTest extends TestCase
     public function testTimestamps(): void
     {
         $order = new Order();
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
 
         $order->setConfirmedAt($now);
         $order->setReadyAt($now);
