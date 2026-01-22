@@ -608,15 +608,26 @@ class AppFixtures extends Fixture
     private function createLoyaltyAccounts(ObjectManager $manager, array $users): array
     {
         $accounts = [];
-        $tiers = ['bronze', 'bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold'];
+        // Distribution réaliste: beaucoup de bronze, moins aux niveaux supérieurs
+        $tiers = ['bronze', 'bronze', 'bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'platinum', 'diamond'];
 
         foreach ($users as $user) {
+            $tier = $this->faker->randomElement($tiers);
             $account = new LoyaltyAccount();
             $account->setUser($user);
-            $account->setPoints($this->faker->numberBetween(0, 500));
-            $account->setTotalPointsEarned($this->faker->numberBetween(0, 2000));
+            $account->setTier($tier);
+
+            // Points cohérents avec le tier (on peut avoir accumulé des points après upgrade)
+            $maxPoints = match ($tier) {
+                'bronze' => 49,     // Pas encore assez pour upgrade
+                'silver' => 149,
+                'gold' => 249,
+                'platinum' => 499,
+                'diamond' => 1000,  // Tier max, accumule
+            };
+            $account->setPoints($this->faker->numberBetween(0, $maxPoints));
+            $account->setTotalPointsEarned($this->faker->numberBetween(50, 3000));
             $account->setTotalPointsSpent($this->faker->numberBetween(0, 500));
-            $account->setTier($this->faker->randomElement($tiers));
 
             $manager->persist($account);
             $accounts[] = $account;

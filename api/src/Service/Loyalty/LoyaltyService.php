@@ -21,13 +21,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class LoyaltyService
 {
-    private const POINTS_PER_EURO = 10;
-    private const TIER_MULTIPLIERS = [
-        'bronze' => 1.0,
-        'silver' => 1.25,
-        'gold' => 1.5,
-        'platinum' => 2.0,
-    ];
+    private const POINTS_PER_EURO = 1;
 
     public function __construct(
         private readonly LoyaltyAccountRepository $accountRepository,
@@ -48,14 +42,14 @@ final class LoyaltyService
         $account = $this->getOrCreateAccount($user);
 
         $basePoints = (int) floor((float) $order->getTotalAmount() * self::POINTS_PER_EURO);
-        $multiplier = self::TIER_MULTIPLIERS[$account->getTier()] ?? 1.0;
+        $multiplier = $account->getCurrentMultiplier();
         $points = (int) floor($basePoints * $multiplier);
 
         $transaction = new LoyaltyTransaction();
         $transaction->setType(LoyaltyTransactionType::EARN);
         $transaction->setPoints($points);
         $transaction->setDescription(\sprintf(
-            'Points gagnés pour la commande %s (x%.2f bonus %s)',
+            'Points gagnés pour la commande %s (x%.2f %s)',
             $order->getOrderNumber(),
             $multiplier,
             $account->getTier(),
@@ -195,17 +189,51 @@ final class LoyaltyService
         return $this->transactionRepository->findByAccount($account, $limit);
     }
 
-    public function calculatePointsForAmount(float $amount, string $tier = 'bronze'): int
+    public function calculatePointsForAmount(float $amount, float $multiplier = 1.0): int
     {
         $basePoints = (int) floor($amount * self::POINTS_PER_EURO);
-        $multiplier = self::TIER_MULTIPLIERS[$tier] ?? 1.0;
 
         return (int) floor($basePoints * $multiplier);
     }
 
+    public function upgradeTier(User $user): LoyaltyTransaction
+    {
+        $account = $this->getOrCreateAccount($user);
+
+        $oldTier = $account->getTier();
+        $upgradeCost = $account->getUpgradeCost();
+
+        if (null === $upgradeCost) {
+            throw new \LogicException('Vous avez déjà atteint le niveau maximum');
+        }
+
+        if ($account->getPoints() < $upgradeCost) {
+            throw new InsufficientPointsException($upgradeCost, $account->getPoints());
+        }
+
+        $account->upgrade();
+        $newTier = $account->getTier();
+
+        $transaction = new LoyaltyTransaction();
+        $transaction->setType(LoyaltyTransactionType::REDEEM);
+        $transaction->setPoints($upgradeCost);
+        $transaction->setDescription(\sprintf(
+            'Upgrade de carte: %s → %s (x%.2f)',
+            $oldTier,
+            $newTier,
+            $account->getCurrentMultiplier(),
+        ));
+
+        $account->addTransaction($transaction);
+
+        $this->entityManager->flush();
+
+        return $transaction;
+    }
+
     private function meetsRequiredTier(string $userTier, string $requiredTier): bool
     {
-        $tierOrder = ['bronze' => 0, 'silver' => 1, 'gold' => 2, 'platinum' => 3];
+        $tierOrder = ['bronze' => 0, 'silver' => 1, 'gold' => 2, 'platinum' => 3, 'diamond' => 4];
         $userLevel = $tierOrder[$userTier] ?? 0;
         $requiredLevel = $tierOrder[$requiredTier] ?? 0;
 

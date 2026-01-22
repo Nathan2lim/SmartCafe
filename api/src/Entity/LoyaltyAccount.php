@@ -8,8 +8,10 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\LoyaltyAccountRepository;
 use App\State\MyLoyaltyProvider;
+use App\State\UpgradeTierProcessor;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -26,6 +28,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
             security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['loyalty:read', 'loyalty:me']],
             name: 'get_my_loyalty',
+        ),
+        new Post(
+            uriTemplate: '/auth/me/loyalty/upgrade',
+            processor: UpgradeTierProcessor::class,
+            security: "is_granted('ROLE_USER')",
+            input: false,
+            output: LoyaltyTransaction::class,
+            normalizationContext: ['groups' => ['loyalty_transaction:read']],
+            name: 'upgrade_loyalty_tier',
         ),
         new Get(security: "is_granted('ROLE_ADMIN') or object.getUser() == user"),
     ],
@@ -63,6 +74,14 @@ class LoyaltyAccount
     #[Groups(['loyalty:read', 'user:me'])]
     #[ApiProperty(example: 'gold')]
     private string $tier = 'bronze';
+
+    private const TIER_CONFIG = [
+        'bronze' => ['multiplier' => 1.0, 'upgradePoints' => 50, 'nextTier' => 'silver'],
+        'silver' => ['multiplier' => 1.10, 'upgradePoints' => 150, 'nextTier' => 'gold'],
+        'gold' => ['multiplier' => 1.25, 'upgradePoints' => 250, 'nextTier' => 'platinum'],
+        'platinum' => ['multiplier' => 1.75, 'upgradePoints' => 500, 'nextTier' => 'diamond'],
+        'diamond' => ['multiplier' => 2.0, 'upgradePoints' => null, 'nextTier' => null],
+    ];
 
     #[ORM\OneToMany(targetEntity: LoyaltyTransaction::class, mappedBy: 'account', cascade: ['persist'], orphanRemoval: true)]
     #[ORM\OrderBy(['createdAt' => 'DESC'])]
@@ -117,7 +136,6 @@ class LoyaltyAccount
         $this->points += $points;
         $this->totalPointsEarned += $points;
         $this->updatedAt = new DateTimeImmutable();
-        $this->updateTier();
 
         return $this;
     }
@@ -167,14 +185,28 @@ class LoyaltyAccount
         return $this;
     }
 
-    private function updateTier(): void
+    public function canUpgrade(): bool
     {
-        $this->tier = match (true) {
-            $this->totalPointsEarned >= 5000 => 'platinum',
-            $this->totalPointsEarned >= 2000 => 'gold',
-            $this->totalPointsEarned >= 500 => 'silver',
-            default => 'bronze',
-        };
+        $config = self::TIER_CONFIG[$this->tier] ?? null;
+        if (!$config || null === $config['upgradePoints']) {
+            return false;
+        }
+
+        return $this->points >= $config['upgradePoints'];
+    }
+
+    public function upgrade(): bool
+    {
+        if (!$this->canUpgrade()) {
+            return false;
+        }
+
+        $config = self::TIER_CONFIG[$this->tier];
+        $this->tier = $config['nextTier'];
+        $this->points = 0;
+        $this->updatedAt = new DateTimeImmutable();
+
+        return true;
     }
 
     /**
@@ -220,29 +252,36 @@ class LoyaltyAccount
     }
 
     #[Groups(['loyalty:read'])]
-    #[ApiProperty(example: 350)]
-    public function getPointsToNextTier(): int
+    #[ApiProperty(example: 50)]
+    public function getUpgradeCost(): ?int
     {
-        return match ($this->tier) {
-            'bronze' => 500 - $this->totalPointsEarned,
-            'silver' => 2000 - $this->totalPointsEarned,
-            'gold' => 5000 - $this->totalPointsEarned,
-            'platinum' => 0,
-            default => 0,
-        };
+        return self::TIER_CONFIG[$this->tier]['upgradePoints'] ?? null;
+    }
+
+    #[Groups(['loyalty:read'])]
+    #[ApiProperty(example: 35)]
+    public function getPointsToUpgrade(): int
+    {
+        $cost = $this->getUpgradeCost();
+        if (null === $cost) {
+            return 0;
+        }
+
+        return max(0, $cost - $this->points);
     }
 
     #[Groups(['loyalty:read'])]
     #[ApiProperty(example: 'silver')]
     public function getNextTier(): ?string
     {
-        return match ($this->tier) {
-            'bronze' => 'silver',
-            'silver' => 'gold',
-            'gold' => 'platinum',
-            'platinum' => null,
-            default => 'silver',
-        };
+        return self::TIER_CONFIG[$this->tier]['nextTier'] ?? null;
+    }
+
+    #[Groups(['loyalty:read'])]
+    #[ApiProperty(example: true)]
+    public function getCanUpgrade(): bool
+    {
+        return $this->canUpgrade();
     }
 
     #[Groups(['loyalty:me'])]
@@ -257,5 +296,24 @@ class LoyaltyAccount
     public function getTransactionsUrl(): string
     {
         return '/api/auth/me/loyalty/transactions';
+    }
+
+    #[Groups(['loyalty:read', 'user:me'])]
+    #[ApiProperty(example: 1.25)]
+    public function getCurrentMultiplier(): float
+    {
+        return self::TIER_CONFIG[$this->tier]['multiplier'] ?? 1.0;
+    }
+
+    #[Groups(['loyalty:read'])]
+    #[ApiProperty(example: 1.25)]
+    public function getNextMultiplier(): ?float
+    {
+        $nextTier = $this->getNextTier();
+        if (null === $nextTier) {
+            return null;
+        }
+
+        return self::TIER_CONFIG[$nextTier]['multiplier'] ?? null;
     }
 }

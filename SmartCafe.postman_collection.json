@@ -193,6 +193,67 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Loyalty",
+			"item": [
+				{
+					"name": "Get My Loyalty Account",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/me/loyalty",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "me", "loyalty"]
+						},
+						"description": "Récupère le compte fidélité de l'utilisateur connecté avec: points, tier, multiplier, etc."
+					},
+					"response": []
+				},
+				{
+					"name": "Upgrade Tier",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/me/loyalty/upgrade",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "me", "loyalty", "upgrade"]
+						},
+						"description": "Passe à la carte supérieure. Nécessite d'avoir assez de points (50/150/250/500). Points remis à 0 après upgrade."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Rewards",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/loyalty/rewards",
+							"host": ["{{base_url}}"],
+							"path": ["api", "loyalty", "rewards"]
+						},
+						"description": "Liste toutes les récompenses disponibles"
+					},
+					"response": []
+				},
+				{
+					"name": "Redeem Reward",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/loyalty/rewards/1/redeem",
+							"host": ["{{base_url}}"],
+							"path": ["api", "loyalty", "rewards", "1", "redeem"]
+						},
+						"description": "Échange des points contre une récompense (remplacer 1 par l'ID de la récompense)"
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
