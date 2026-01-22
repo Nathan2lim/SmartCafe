@@ -6,6 +6,7 @@ $finder = (new PhpCsFixer\Finder())
     ->exclude('vendor')
     ->exclude('node_modules')
     ->exclude('public/bundles')
+    ->notPath('config/reference.php')
 ;
 
 return (new PhpCsFixer\Config())
