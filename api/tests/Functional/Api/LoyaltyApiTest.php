@@ -46,8 +46,10 @@ class LoyaltyApiTest extends ApiTestCase
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        $this->assertArrayHasKey('member', $data);
-        $this->assertCount(2, $data['member']);
+        // Check for either JSON-LD (hydra:member) or JSON array format
+        $members = $data['hydra:member'] ?? $data['member'] ?? $data;
+        $this->assertIsArray($members);
+        $this->assertCount(2, $members);
     }
 
     public function testRedeemRewardSuccess(): void

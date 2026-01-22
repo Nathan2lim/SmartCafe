@@ -17,7 +17,11 @@ abstract class ApiTestCase extends BaseApiTestCase
 
     protected function setUp(): void
     {
-        $this->client = static::createClient();
+        $this->client = static::createClient([], [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
         $this->entityManager = static::getContainer()->get('doctrine')->getManager();
     }
 
@@ -73,6 +77,7 @@ abstract class ApiTestCase extends BaseApiTestCase
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
                 'Content-Type' => 'application/json',
+                'Accept' => 'application/ld+json',
             ],
         ]);
     }
@@ -84,6 +89,16 @@ abstract class ApiTestCase extends BaseApiTestCase
         ?User $user = null,
     ): \Symfony\Contracts\HttpClient\ResponseInterface {
         $client = $user ? $this->createAuthenticatedClient($user) : $this->client;
+
+        // Ensure headers array exists
+        if (!isset($options['headers'])) {
+            $options['headers'] = [];
+        }
+
+        // Ensure Accept header is set for JSON-LD format
+        if (!isset($options['headers']['Accept'])) {
+            $options['headers']['Accept'] = 'application/ld+json';
+        }
 
         return $client->request($method, $url, $options);
     }

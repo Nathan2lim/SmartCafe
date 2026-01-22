@@ -7,8 +7,8 @@ api_platform:
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
     formats:
-        json: ['application/json']
         jsonld: ['application/ld+json']
+        json: ['application/json']
     docs_formats:
         jsonopenapi: ['application/vnd.openapi+json']
         html: ['text/html']

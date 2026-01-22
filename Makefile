@@ -1,4 +1,4 @@
-.PHONY: help build up down restart logs shell db-create db-migrate db-seed
+.PHONY: help build up down restart logs shell db-create db-migrate db-seed test test-unit test-functional phpstan cs-check cs-fix qa
 
 help: ## Affiche l'aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -42,3 +42,23 @@ jwt-generate: ## Génère les clés JWT
 	docker-compose exec php php bin/console lexik:jwt:generate-keypair --overwrite
 
 init: build up composer-install db-create db-migrate ## Initialise le projet complet
+
+test: ## Lance tous les tests
+	docker-compose exec php ./vendor/bin/phpunit
+
+test-unit: ## Lance les tests unitaires
+	docker-compose exec php ./vendor/bin/phpunit --testsuite=Unit
+
+test-functional: ## Lance les tests fonctionnels
+	docker-compose exec php ./vendor/bin/phpunit --testsuite=Functional
+
+phpstan: ## Analyse statique du code
+	docker-compose exec php ./vendor/bin/phpstan analyse
+
+cs-check: ## Vérifie le style de code
+	docker-compose exec php ./vendor/bin/php-cs-fixer fix --dry-run --diff
+
+cs-fix: ## Corrige le style de code
+	docker-compose exec php ./vendor/bin/php-cs-fixer fix
+
+qa: cs-check phpstan test ## Lance tous les checks qualité

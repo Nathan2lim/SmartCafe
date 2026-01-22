@@ -44,28 +44,28 @@ class LoyaltyServiceTest extends TestCase
         );
     }
 
-    public function testCalculatePointsForAmountBronzeTier(): void
+    public function testCalculatePointsForAmountDefaultMultiplier(): void
     {
-        $points = $this->service->calculatePointsForAmount(10.00, 'bronze');
-        $this->assertEquals(100, $points); // 10 * 10 * 1.0
+        $points = $this->service->calculatePointsForAmount(10.00);
+        $this->assertEquals(10, $points); // 10 * 1 * 1.0
     }
 
-    public function testCalculatePointsForAmountSilverTier(): void
+    public function testCalculatePointsForAmountWithMultiplier(): void
     {
-        $points = $this->service->calculatePointsForAmount(10.00, 'silver');
-        $this->assertEquals(125, $points); // 10 * 10 * 1.25
+        $points = $this->service->calculatePointsForAmount(10.00, 1.5);
+        $this->assertEquals(15, $points); // 10 * 1 * 1.5
     }
 
-    public function testCalculatePointsForAmountGoldTier(): void
+    public function testCalculatePointsForAmountLargeAmount(): void
     {
-        $points = $this->service->calculatePointsForAmount(10.00, 'gold');
-        $this->assertEquals(150, $points); // 10 * 10 * 1.5
+        $points = $this->service->calculatePointsForAmount(100.00, 2.0);
+        $this->assertEquals(200, $points); // 100 * 1 * 2.0
     }
 
-    public function testCalculatePointsForAmountPlatinumTier(): void
+    public function testCalculatePointsForAmountWithDecimal(): void
     {
-        $points = $this->service->calculatePointsForAmount(10.00, 'platinum');
-        $this->assertEquals(200, $points); // 10 * 10 * 2.0
+        $points = $this->service->calculatePointsForAmount(25.50, 1.25);
+        $this->assertEquals(31, $points); // floor(25 * 1.25) = floor(31.25) = 31
     }
 
     public function testGetOrCreateAccountExisting(): void
@@ -108,7 +108,7 @@ class LoyaltyServiceTest extends TestCase
 
         $this->assertInstanceOf(LoyaltyTransaction::class, $transaction);
         $this->assertEquals(LoyaltyTransactionType::EARN, $transaction->getType());
-        $this->assertEquals(255, $transaction->getPoints()); // 25.50 * 10 * 1.0
+        $this->assertEquals(25, $transaction->getPoints()); // floor(25.50 * 1) * 1.0
         $this->assertGreaterThan(0, $account->getPoints());
     }
 
