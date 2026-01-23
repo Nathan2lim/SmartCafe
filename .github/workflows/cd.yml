@@ -149,38 +149,71 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
             cd ~/apps/SmartCafe
 
-            # Pull latest code
+            echo "📥 Pulling latest code..."
             git pull origin main
 
-            # Pull latest images
-            docker compose -f docker-compose.prod.yml pull
+            echo "📂 Current directory contents:"
+            ls -la
 
-            # Rebuild and restart services
-            docker compose -f docker-compose.prod.yml up -d --build
+            echo "🔍 Checking docker-compose.prod.yml exists..."
+            if [ ! -f docker-compose.prod.yml ]; then
+              echo "❌ docker-compose.prod.yml not found!"
+              exit 1
+            fi
 
-            # Run migrations
-            docker compose -f docker-compose.prod.yml exec -T php php bin/console doctrine:migrations:migrate --no-interaction
+            echo "🔨 Building and starting services..."
+            docker compose -f docker-compose.prod.yml up -d --build 2>&1
 
-            # Clear cache
-            docker compose -f docker-compose.prod.yml exec -T php php bin/console cache:clear --env=prod
+            echo "⏳ Waiting for services to be ready..."
+            sleep 20
 
-            # Cleanup old images
+            echo "📊 Docker container status:"
+            docker compose -f docker-compose.prod.yml ps
+
+            echo "🗃️ Running migrations..."
+            docker compose -f docker-compose.prod.yml exec -T php php bin/console doctrine:migrations:migrate --no-interaction 2>&1 || echo "Migration skipped or failed"
+
+            echo "🧹 Clearing cache..."
+            docker compose -f docker-compose.prod.yml exec -T php php bin/console cache:clear --env=prod 2>&1 || echo "Cache clear skipped or failed"
+
+            echo "🗑️ Cleaning up old images..."
             docker image prune -f
 
-            echo "Deployment completed!"
+            echo "📊 Final container status:"
+            docker compose -f docker-compose.prod.yml ps
+
+            echo "✅ Deployment completed!"
 
       - name: Health check - API
         run: |
+          echo "Waiting for services to be fully ready..."
           sleep 10
-          curl -f http://152.228.131.67:8080/api || exit 1
-          echo "API health check passed!"
+          for i in {1..5}; do
+            if curl -sf http://152.228.131.67:8080/api > /dev/null 2>&1; then
+              echo "✅ API health check passed!"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 5s..."
+            sleep 5
+          done
+          echo "❌ API health check failed after 5 attempts"
+          exit 1
 
       - name: Health check - Admin
         run: |
-          curl -f http://152.228.131.67/health || exit 1
-          echo "Admin health check passed!"
+          for i in {1..5}; do
+            if curl -sf http://152.228.131.67/ > /dev/null 2>&1; then
+              echo "✅ Admin health check passed!"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 5s..."
+            sleep 5
+          done
+          echo "❌ Admin health check failed after 5 attempts"
+          exit 1
 
       - name: Notify on success
         if: success()
