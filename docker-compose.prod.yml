@@ -66,14 +66,14 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-smartcafe}
-      POSTGRES_USER: ${POSTGRES_USER:-smartcafe_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartcafe_password}
+      POSTGRES_USER: ${POSTGRES_USER:-smartcafe}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartcafe_prod_2026}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - smartcafe_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartcafe_user} -d ${POSTGRES_DB:-smartcafe}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartcafe} -d ${POSTGRES_DB:-smartcafe}"]
       interval: 10s
       timeout: 5s
       retries: 5
