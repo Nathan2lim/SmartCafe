@@ -155,14 +155,17 @@ jobs:
             echo "📥 Pulling latest code..."
             git pull origin main
 
-            echo "📂 Current directory contents:"
-            ls -la
-
             echo "🔍 Checking docker-compose.prod.yml exists..."
             if [ ! -f docker-compose.prod.yml ]; then
               echo "❌ docker-compose.prod.yml not found!"
               exit 1
             fi
+
+            echo "🛑 Stopping existing containers..."
+            docker compose -f docker-compose.prod.yml down --remove-orphans 2>&1 || true
+
+            # Also stop any containers from the old docker-compose.yml
+            docker compose down --remove-orphans 2>&1 || true
 
             echo "🔨 Building and starting services..."
             docker compose -f docker-compose.prod.yml up -d --build 2>&1
