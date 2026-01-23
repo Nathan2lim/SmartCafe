@@ -2,6 +2,12 @@
 api:
   - api/**/*
 
+admin:
+  - admin/**/*
+
+frontend:
+  - admin/src/**/*
+
 tests:
   - api/tests/**/*
 
@@ -11,12 +17,20 @@ documentation:
 
 ci:
   - .github/**/*
-  - api/docker/**/*
-  - api/Makefile
+  - docker/**/*
+  - Makefile
+  - docker-compose*.yml
+
+docker:
+  - docker/**/*
+  - docker-compose*.yml
+  - '**/Dockerfile'
 
 dependencies:
   - api/composer.json
   - api/composer.lock
+  - admin/package.json
+  - admin/package-lock.json
 
 database:
   - api/migrations/**/*
